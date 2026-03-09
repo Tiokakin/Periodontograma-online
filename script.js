@@ -51,44 +51,50 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-    function procesarTextoPeriodontal(texto) {
-        // 1. Detectar Diente (ej: "Diente 1.6" o "Diente uno seis")
-        const matchDiente = texto.match(/diente\s*(\d|uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve)[\s.]?(\d|uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve)/);
-        if (matchDiente) {
-            dienteLabel.innerText = "Diente: " + texto.match(/diente\s*[\d.]+/);
-        }
-
-        // 2. Detectar Cara
-        let cara = null;
-        if (texto.includes("vestibular")) cara = "v";
-        else if (texto.includes("palatino") || texto.includes("lingual")) cara = "p";
-
-        if (cara) {
-            const partes = texto.split(/vestibular|palatino|lingual/);
-            const contenido = partes[1];
-
-            // Convertir palabras a números y limpiar el texto
-            let textoLimpio = contenido;
-            for (let [palabra, num] of Object.entries(palabrasANumeros)) {
-                textoLimpio = textoLimpio.replace(new RegExp(palabra, 'g'), num);
-            }
-
-            const numeros = textoLimpio.match(/\d/g);
-            const ss = contenido.includes("sangre") || contenido.includes("sangrado");
-            const sup = contenido.includes("pus") || contenido.includes("supuración");
-
-            if (numeros && numeros.length >= 6) {
-                // NIC (Distal, Medio, Mesial) + PS (Distal, Medio, Mesial)
-                asignar(cara, 'd', numeros[0], numeros[3], ss, sup);
-                asignar(cara, 'm', numeros[1], numeros[4], ss, sup);
-                asignar(cara, 'mes', numeros[2], numeros[5], ss, sup);
-                actualizarGrafico(cara);
-            } else {
-                status.innerText = "⚠️ Error: Necesito 6 números (3 NIC y 3 PS). Escuché " + (numeros ? numeros.length : 0);
-            }
-        }
+  function procesarTextoPeriodontal(texto) {
+    // 1. Detectar Diente
+    const matchDiente = texto.match(/diente\s*(\d|uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve)[\s.]?(\d|uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve)/);
+    if (matchDiente) {
+        dienteLabel.innerText = "Diente: " + texto.match(/diente\s*[\d.]+/);
     }
 
+    // 2. Detectar Cara
+    let cara = null;
+    if (texto.includes("vestibular")) cara = "v";
+    else if (texto.includes("palatino") || texto.includes("lingual")) cara = "p";
+
+    if (cara) {
+        const partes = texto.split(/vestibular|palatino|lingual/);
+        const contenido = partes[1];
+
+        let textoLimpio = contenido;
+        for (let [palabra, num] of Object.entries(palabrasANumeros)) {
+            textoLimpio = textoLimpio.replace(new RegExp(palabra, 'g'), num);
+        }
+
+        const numeros = textoLimpio.match(/\d/g);
+        const ss = contenido.includes("sangre") || contenido.includes("sangrado");
+        const sup = contenido.includes("pus") || contenido.includes("supuración");
+
+        if (numeros && numeros.length >= 6) {
+            asignar(cara, 'd', numeros[0], numeros[3], ss, sup);
+            asignar(cara, 'm', numeros[1], numeros[4], ss, sup);
+            asignar(cara, 'mes', numeros[2], numeros[5], ss, sup);
+            actualizarGrafico(cara);
+
+            // --- AUTO-GUARDADO ---
+            // Si la cara procesada fue Palatino o Lingual, guardamos automáticamente
+            if (cara === 'p') {
+                status.innerText = "✅ Palatino detectado. Guardando en 1.5 segundos...";
+                setTimeout(() => {
+                    guardarDienteActual();
+                }, 1500); // 1.5 segundos de pausa para que alcances a ver los datos en la tabla
+            }
+        } else {
+            status.innerText = "⚠️ Error: Faltan números. Escuché " + (numeros ? numeros.length : 0);
+        }
+    }
+}
     function asignar(c, p, nic, ps, ss, sup) {
         const iNic = document.getElementById(`${c}-${p}-nic`);
         const iPs = document.getElementById(`${c}-${p}-ps`);
@@ -167,3 +173,4 @@ document.addEventListener('DOMContentLoaded', () => {
         doc.save("registro_investigacion.pdf");
     };
 });
+
