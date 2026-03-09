@@ -18,7 +18,15 @@
     <main>
         <div class="ficha-clinica">
             <h2 id="diente-actual">Diente: 1.6</h2>
-            
+            <div class="grafico-container">
+    <svg id="periodontograma-svg" viewBox="0 0 300 150">
+        <line x1="0" y1="50" x2="300" y2="50" stroke="#ccc" stroke-dasharray="4"/>
+        
+        <polyline id="linea-recesion" fill="none" stroke="blue" stroke-width="2" points="50,50 150,50 250,50" />
+        
+        <polyline id="linea-sondaje" fill="none" stroke="red" stroke-width="2" points="50,50 150,50 250,50" />
+    </svg>
+</div>
             <div class="tabla-scroll">
                 <table>
                     <thead>
@@ -103,6 +111,7 @@
     </tbody>
 </body>
 </html>
+
 
 
 
