@@ -1,4 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
+
+    // --- ANCLA: VARIABLES ---
     const btnVoz = document.getElementById('btn-voz');
     const btnGuardar = document.getElementById('btn-guardar');
     const btnPdf = document.getElementById('btn-pdf');
@@ -8,114 +10,79 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const secuenciaDientes = ["1.8", "1.7", "1.6", "1.5", "1.4", "1.3", "1.2", "1.1", "2.1", "2.2", "2.3", "2.4", "2.5", "2.6", "2.7", "2.8"];
     let indiceActual = 0;
-    let memoriaPacientes = [];
+    let memoriaExamen = [];
 
-    // Diccionario para convertir palabras a números (Acento Chileno)
-    const palabrasANumeros = {
-        'uno': 1, 'dos': 2, 'tres': 3, 'cuatro': 4, 'cinco': 5, 
-        'seis': 6, 'siete': 7, 'ocho': 8, 'nueve': 9, 'cero': 0
-    };
+    const palabrasANumeros = {'uno': 1, 'dos': 2, 'tres': 3, 'cuatro': 4, 'cinco': 5, 'seis': 6, 'siete': 7, 'ocho': 8, 'nueve': 9, 'cero': 0};
 
+    // --- ANCLA: VOZ ---
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     const recognition = new SpeechRecognition ? new SpeechRecognition() : null;
 
     if (recognition) {
         recognition.lang = 'es-CL';
         recognition.continuous = true;
-        recognition.interimResults = false;
+        btnVoz.onclick = () => { try { recognition.start(); } catch (e) { recognition.stop(); } };
 
-        btnVoz.onclick = () => {
-            try { recognition.start(); } catch (e) { recognition.stop(); }
-        };
-
-        recognition.onstart = () => {
-            status.innerText = "🎤 ESCUCHANDO... Di la cara y los 6 números.";
-            btnVoz.style.background = "#dc3545";
-            btnVoz.innerText = "🛑 Detener Dictado";
-        };
-
-        recognition.onend = () => {
-            btnVoz.style.background = "#28a745";
-            btnVoz.innerText = "🎤 Iniciar Dictado";
-        };
+        recognition.onstart = () => { status.innerText = "🎤 Escuchando..."; btnVoz.style.background = "#dc3545"; };
+        recognition.onend = () => { btnVoz.style.background = "#28a745"; };
 
         recognition.onresult = (event) => {
             const transcript = event.results[event.results.length - 1][0].transcript.toLowerCase();
             status.innerText = "Escuché: " + transcript;
             
             if (transcript.includes("guardar") || transcript.includes("siguiente")) {
-                guardarDienteActual();
+                ejecutarGuardado();
             } else {
-                procesarTextoPeriodontal(transcript);
+                procesarComandos(transcript);
             }
         };
     }
 
-  function procesarTextoPeriodontal(texto) {
-    // 1. Detectar Diente
-    const matchDiente = texto.match(/diente\s*(\d|uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve)[\s.]?(\d|uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve)/);
-    if (matchDiente) {
-        dienteLabel.innerText = "Diente: " + texto.match(/diente\s*[\d.]+/);
-    }
-
-    // 2. Detectar Cara
-    let cara = null;
-    if (texto.includes("vestibular")) cara = "v";
-    else if (texto.includes("palatino") || texto.includes("lingual")) cara = "p";
-
-    if (cara) {
-        const partes = texto.split(/vestibular|palatino|lingual/);
-        const contenido = partes[1];
-
-        let textoLimpio = contenido;
-        for (let [palabra, num] of Object.entries(palabrasANumeros)) {
-            textoLimpio = textoLimpio.replace(new RegExp(palabra, 'g'), num);
+    // --- ANCLA: PROCESADOR ---
+    function procesarComandos(texto) {
+        // Reconocimiento de Diente
+        const matchDiente = texto.match(/diente\s*(\d|uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve)[\s.]?(\d|uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve)/);
+        if (matchDiente) {
+            const num = texto.match(/diente\s*[\d.]+/)[0].replace("diente ", "");
+            dienteLabel.innerText = "Diente: " + num;
+            actualizarSiluetaDiente(num);
         }
 
-        const numeros = textoLimpio.match(/\d/g);
-        const ss = contenido.includes("sangre") || contenido.includes("sangrado");
-        const sup = contenido.includes("pus") || contenido.includes("supuración");
+        // Reconocimiento de Cara y Números
+        let cara = texto.includes("vestibular") ? "v" : (texto.includes("palatino") || texto.includes("lingual") ? "p" : null);
+        if (cara) {
+            let textoLimpio = texto.split(cara === "v" ? "vestibular" : "palatino")[1];
+            for (let [p, n] of Object.entries(palabrasANumeros)) { textoLimpio = textoLimpio.replace(new RegExp(p, 'g'), n); }
+            
+            const nums = textoLimpio.match(/\d/g);
+            const ss = textoLimpio.includes("sangre") || textoLimpio.includes("sangrado");
 
-        if (numeros && numeros.length >= 6) {
-            asignar(cara, 'd', numeros[0], numeros[3], ss, sup);
-            asignar(cara, 'm', numeros[1], numeros[4], ss, sup);
-            asignar(cara, 'mes', numeros[2], numeros[5], ss, sup);
-            actualizarGrafico(cara);
+            if (nums && nums.length >= 6) {
+                asignarValores(cara, 'd', nums[0], nums[3], ss);
+                asignarValores(cara, 'm', nums[1], nums[4], ss);
+                asignarValores(cara, 'mes', nums[2], nums[5], ss);
+                actualizarGrafico(cara);
 
-            // --- AUTO-GUARDADO ---
-            // Si la cara procesada fue Palatino o Lingual, guardamos automáticamente
-            if (cara === 'p') {
-                status.innerText = "✅ Palatino detectado. Guardando en 1.5 segundos...";
-                setTimeout(() => {
-                    guardarDienteActual();
-                }, 1500); // 1.5 segundos de pausa para que alcances a ver los datos en la tabla
+                // AUTO-GUARDADO TRAS PALATINO
+                if (cara === 'p') {
+                    status.innerText = "✅ Palatino detectado. Guardando...";
+                    setTimeout(ejecutarGuardado, 1500);
+                }
             }
-        } else {
-            status.innerText = "⚠️ Error: Faltan números. Escuché " + (numeros ? numeros.length : 0);
-        }
-    }
-}
-    function asignar(c, p, nic, ps, ss, sup) {
-        const iNic = document.getElementById(`${c}-${p}-nic`);
-        const iPs = document.getElementById(`${c}-${p}-ps`);
-        const tRec = document.getElementById(`${c}-${p}-rec`);
-        const cSs = document.getElementById(`${c}-${p}-ss`);
-        const cSup = document.getElementById(`${c}-${p}-sup`);
-
-        if (iNic && iPs) {
-            iNic.value = nic;
-            iPs.value = ps;
-            // Cálculo: REC = NIC - PS
-            const rec = parseInt(nic) - parseInt(ps);
-            tRec.innerText = rec;
-            if(cSs) cSs.checked = ss;
-            if(cSup) cSup.checked = sup;
-
-            // Alerta visual de severidad
-            iNic.style.backgroundColor = (parseInt(nic) >= 5) ? "#ffdce0" : "white";
         }
     }
 
+    // --- ANCLA: TABLA ---
+    function asignarValores(c, p, nic, ps, ss) {
+        document.getElementById(`${c}-${p}-nic`).value = nic;
+        document.getElementById(`${c}-${p}-ps`).value = ps;
+        const rec = parseInt(nic) - parseInt(ps);
+        document.getElementById(`${c}-${p}-rec`).innerText = rec;
+        document.getElementById(`${c}-${p}-ss`).checked = ss;
+        document.getElementById(`${c}-${p}-nic`).style.backgroundColor = (nic >= 5) ? "#ffdce0" : "white";
+    }
+
+    // --- ANCLA: GRAFICO ---
     function actualizarGrafico(cara) {
         const pts = ['d', 'm', 'mes'];
         let cR = "", cP = "";
@@ -131,46 +98,48 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('linea-sondaje').setAttribute('points', cP);
     }
 
-    // --- FUNCIONES DE GUARDADO Y PDF (Igual que antes) ---
-    btnGuardar.onclick = guardarDienteActual;
+    function actualizarSiluetaDiente(num) {
+        const forma = document.getElementById('forma-diente');
+        const seg = parseInt(num.split('.')[1]);
+        if (seg <= 3) forma.setAttribute("d", "M100,50 Q100,20 150,20 Q200,20 200,50 L190,80 Q150,190 150,190 L110,80 Z");
+        else forma.setAttribute("d", "M80,50 Q80,20 150,20 Q220,20 220,50 L220,80 Q220,150 180,180 L150,150 L120,180 Q80,150 80,80 Z");
+    }
 
-    function guardarDienteActual() {
+    // --- ANCLA: GUARDADO ---
+    btnGuardar.onclick = ejecutarGuardado;
+    function ejecutarGuardado() {
         const diente = secuenciaDientes[indiceActual];
-        const registro = {
-            diente: diente,
-            v: { d: document.getElementById('v-d-ps').value, m: document.getElementById('v-m-ps').value, mes: document.getElementById('v-mes-ps').value },
-            p: { d: document.getElementById('p-d-ps').value, m: document.getElementById('p-m-ps').value, mes: document.getElementById('p-mes-ps').value }
-        };
-        memoriaPacientes.push(registro);
+        memoriaExamen.push({ 
+            diente, 
+            v: [document.getElementById('v-d-ps').value, document.getElementById('v-m-ps').value, document.getElementById('v-mes-ps').value],
+            p: [document.getElementById('p-d-ps').value, document.getElementById('p-m-ps').value, document.getElementById('p-mes-ps').value]
+        });
         
-        if (memoriaPacientes.length === 1) listaHistorial.innerHTML = "";
+        if (memoriaExamen.length === 1) listaHistorial.innerHTML = "";
         const li = document.createElement('li');
-        li.innerHTML = `<strong>Diente ${diente}</strong>: Registrado ✅`;
+        li.innerHTML = `<strong>Diente ${diente}</strong>: Ok ✅`;
         listaHistorial.prepend(li);
 
         indiceActual++;
         if (indiceActual < secuenciaDientes.length) {
             dienteLabel.innerText = "Diente: " + secuenciaDientes[indiceActual];
-            limpiarCampos();
+            actualizarSiluetaDiente(secuenciaDientes[indiceActual]);
+            document.querySelectorAll('input[type="number"]').forEach(i => i.value = 0);
+            document.querySelectorAll('.rec-val').forEach(r => r.innerText = "0");
         }
     }
 
-    function limpiarCampos() {
-        document.querySelectorAll('input[type="number"]').forEach(i => i.value = 0);
-        document.querySelectorAll('.rec-val').forEach(r => r.innerText = "0");
-        document.querySelectorAll('input[type="checkbox"]').forEach(c => c.checked = false);
-    }
-
+    // --- ANCLA: PDF ---
     btnPdf.onclick = () => {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
-        doc.text("Reporte Periodontal Profesional", 20, 20);
+        const nombre = document.getElementById('nombre-paciente').value || "Sin Nombre";
+        doc.text(`Informe Periodontal: ${nombre}`, 20, 20);
         let y = 35;
-        memoriaPacientes.forEach(item => {
-            doc.text(`Diente ${item.diente}: V(${item.v.d}-${item.v.m}-${item.v.mes}) P(${item.p.d}-${item.p.m}-${item.p.mes})`, 20, y);
+        memoriaExamen.forEach(i => {
+            doc.text(`Diente ${i.diente}: V(${i.v.join('-')}) P(${i.p.join('-')})`, 20, y);
             y += 10;
         });
-        doc.save("registro_investigacion.pdf");
+        doc.save(`Examen_${nombre}.pdf`);
     };
 });
-
