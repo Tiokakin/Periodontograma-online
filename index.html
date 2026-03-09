@@ -3,33 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PeriodontoVoice Pro v0.0006</title>
+    <title>PeriodontoVoice Pro v0.0011</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <header>
         <h1>Asistente Periodontal 🦷</h1>
-        <div id="status-container">
-            <button id="btn-voz">🎤 Iniciar Dictado</button>
-            <p id="status">Estado: Listo para trabajar</p>
-        </div>
+        <p id="status">Estado: Listo para trabajar</p>
     </header>
+
+    <div class="botones-control">
+        <button id="btn-voz">🎤 Iniciar Dictado</button>
+        <button id="btn-guardar">💾 Guardar Diente</button>
+        <button id="btn-pdf">📄 Generar Informe PDF</button>
+    </div>
 
     <main>
         <div class="ficha-clinica">
-            <h2 id="diente-actual">Diente: --</h2>
+            <h2 id="diente-actual">Diente: 1.8</h2>
+
+            <div class="grafico-container">
+                <h3 style="font-size: 0.8rem; color: #666; margin-bottom: 5px;">Perfil de Cara Actual</h3>
+                <svg id="periodontograma-svg" viewBox="0 0 300 200">
+                    <line x1="10" y1="85" x2="290" y2="85" stroke="#ccc" stroke-width="1" />
+                    <polyline id="linea-recesion" fill="none" stroke="blue" stroke-width="3" points="50,85 150,85 250,85" />
+                    <polyline id="linea-sondaje" fill="none" stroke="red" stroke-width="3" points="50,85 150,85 250,85" />
+                </svg>
+            </div>
+
             
 
-         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-    <h2 id="diente-actual" style="margin: 0;">Diente: 1.8</h2>
-    <button id="btn-guardar" style="background: #007bff; color: white; border: none; padding: 12px 20px; border-radius: 8px; font-weight: bold; cursor: pointer;">💾 Guardar Diente</button>
-</div>
             <div class="tabla-scroll">
                 <table>
                     <thead>
                         <tr>
                             <th>Cara</th>
-                            <th>Punto</th>
+                            <th>Pto</th>
                             <th>NIC</th>
                             <th>PS</th>
                             <th>REC</th>
@@ -38,50 +47,50 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td rowspan="3" class="etiqueta-cara">Vest.</td>
-                            <td>Distal</td>
+                        <tr class="v-row">
+                            <td rowspan="3" class="etiqueta-cara">V</td>
+                            <td>D</td>
                             <td><input type="number" id="v-d-nic" value="0"></td>
                             <td><input type="number" id="v-d-ps" value="0"></td>
                             <td id="v-d-rec" class="rec-val">0</td>
                             <td><input type="checkbox" id="v-d-ss"></td>
                             <td><input type="checkbox" id="v-d-sup"></td>
                         </tr>
-                        <tr>
-                            <td>Medio</td>
+                        <tr class="v-row">
+                            <td>M</td>
                             <td><input type="number" id="v-m-nic" value="0"></td>
                             <td><input type="number" id="v-m-ps" value="0"></td>
                             <td id="v-m-rec" class="rec-val">0</td>
                             <td><input type="checkbox" id="v-m-ss"></td>
                             <td><input type="checkbox" id="v-m-sup"></td>
                         </tr>
-                        <tr>
-                            <td>Mesial</td>
+                        <tr class="v-row">
+                            <td>Mes</td>
                             <td><input type="number" id="v-mes-nic" value="0"></td>
                             <td><input type="number" id="v-mes-ps" value="0"></td>
                             <td id="v-mes-rec" class="rec-val">0</td>
                             <td><input type="checkbox" id="v-mes-ss"></td>
                             <td><input type="checkbox" id="v-mes-sup"></td>
                         </tr>
-                        <tr style="border-top: 3px solid #0056b3;">
-                            <td rowspan="3" class="etiqueta-cara">Palat.</td>
-                            <td>Distal</td>
+                        <tr class="p-row-divider">
+                            <td rowspan="3" class="etiqueta-cara">P/L</td>
+                            <td>D</td>
                             <td><input type="number" id="p-d-nic" value="0"></td>
                             <td><input type="number" id="p-d-ps" value="0"></td>
                             <td id="p-d-rec" class="rec-val">0</td>
                             <td><input type="checkbox" id="p-d-ss"></td>
                             <td><input type="checkbox" id="p-d-sup"></td>
                         </tr>
-                        <tr>
-                            <td>Medio</td>
+                        <tr class="p-row">
+                            <td>M</td>
                             <td><input type="number" id="p-m-nic" value="0"></td>
                             <td><input type="number" id="p-m-ps" value="0"></td>
                             <td id="p-m-rec" class="rec-val">0</td>
                             <td><input type="checkbox" id="p-m-ss"></td>
                             <td><input type="checkbox" id="p-m-sup"></td>
                         </tr>
-                        <tr>
-                            <td>Mesial</td>
+                        <tr class="p-row">
+                            <td>Mes</td>
                             <td><input type="number" id="p-mes-nic" value="0"></td>
                             <td><input type="number" id="p-mes-ps" value="0"></td>
                             <td id="p-mes-rec" class="rec-val">0</td>
@@ -92,28 +101,20 @@
                 </table>
             </div>
         </div>
-      <div id="historial-container" class="ficha-clinica" style="margin-top: 20px; background-color: #f8f9fa; border-top: 4px solid #28a745; padding: 15px;">
-    <h3 style="margin-top: 0; color: #333;">Dientes Registrados en esta Sesión:</h3>
-    <ul id="lista-historial" style="text-align: left; list-style: none; padding: 0; max-height: 250px; overflow-y: auto; border: 1px solid #ddd; background: white; border-radius: 5px;">
-        <li style="padding: 10px; color: #888; border-bottom: 1px solid #eee;">Esperando el primer registro...</li>
-    </ul>
-</div>
+
+        <div id="historial-container" class="ficha-clinica">
+            <h3>Dientes Registrados:</h3>
+            <ul id="lista-historial">
+                <li style="color: #888;">Esperando registros...</li>
+            </ul>
+        </div>
     </main>
 
     <footer>
-        <p>Desarrollado para Investigación Dental | Versión: <span id="version-num">0.0011</span></p>
+        <p>PeriodontoVoice Pro | Versión: <span id="version-num">0.0111</span></p>
     </footer>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<div class="ficha-clinica" style="text-align: center;">
-    <button id="btn-pdf" style="background: #dc3545; color: white; border: none; padding: 15px 30px; border-radius: 8px; font-weight: bold; width: 100%;">📄 Finalizar y Descargar PDF</button>
-</div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
-
-
-
-
-
-
-
