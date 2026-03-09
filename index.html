@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Periodontograma de Voz Pro</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Dictado Periodontal Automático 🦷</h1>
+        <div id="status">Presiona el botón para iniciar</div>
+        <button id="btn-voz">🎤 Iniciar Dictado</button>
+    </header>
+
+    <main>
+        <div class="contenedor-diente">
+            <h2 id="diente-actual">Diente: 1.6</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Cara</th>
+                        <th>Punto</th>
+                        <th>NIC</th>
+                        <th>PS (Sondaje)</th>
+                        <th>REC (Cálculo)</th>
+                    </tr>
+                </thead>
+                <tbody id="tabla-cuerpo">
+                    <tr class="v-row">
+                        <td rowspan="3">Vestibular</td>
+                        <td>Distal</td>
+                        <td><input type="number" id="v-d-nic"></td>
+                        <td><input type="number" id="v-d-ps"></td>
+                        <td id="v-d-rec">0</td>
+                    </tr>
+                    <tr class="v-row">
+                        <td>Medio</td>
+                        <td><input type="number" id="v-m-nic"></td>
+                        <td><input type="number" id="v-m-ps"></td>
+                        <td id="v-m-rec">0</td>
+                    </tr>
+                    <tr class="v-row">
+                        <td>Mesial</td>
+                        <td><input type="number" id="v-mes-nic"></td>
+                        <td><input type="number" id="v-mes-ps"></td>
+                        <td id="v-mes-rec">0</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

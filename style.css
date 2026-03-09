@@ -1,0 +1,7 @@
+body { font-family: 'Segoe UI', sans-serif; background-color: #f0f4f8; color: #333; text-align: center; }
+header { background-color: #0056b3; color: white; padding: 20px; margin-bottom: 30px; }
+.ficha { background: white; padding: 20px; border-radius: 12px; display: inline-block; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+input { width: 60px; padding: 8px; margin: 10px; border: 1px solid #ccc; border-radius: 4px; }
+#btn-voz { background-color: #28a745; color: white; border: none; padding: 15px 30px; font-size: 18px; border-radius: 50px; cursor: pointer; transition: 0.3s; }
+#btn-voz:hover { background-color: #218838; }
+#diagnostico { margin-top: 30px; padding: 20px; background-color: #d1ecf1; border-radius: 8px; display: inline-block; width: 80%; }
