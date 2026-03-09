@@ -113,4 +113,15 @@ footer {
     font-weight: bold;
     color: var(--primary);
 }
+input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+/* Color para resaltar filas con sangrado */
+.sangrado-activo {
+    background-color: #fff0f0;
+}
+
 
