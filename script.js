@@ -67,33 +67,50 @@ recognition.onresult = (event) => {
 
 function guardarDienteActual() {
     const diente = secuenciaDientes[indiceActual];
-    
-    // Guardamos un objeto con los datos (simplificado para el ejemplo)
-    const datosDiente = {
-        diente: diente,
-        v_d_ps: document.getElementById('v-d-ps').value,
-        // ... aquí podrías agregar todos los campos que quieras salvar
-    };
+    const lista = document.getElementById('lista-historial');
 
-    memoriaPacientes.push(datosDiente);
+    // 1. Verificar si la lista existe en la web
+    if (!lista) {
+        console.error("No se encontró el elemento lista-historial");
+        return;
+    }
 
-    // Actualizar lista visual
-    if (memoriaPacientes.length === 1) listaHistorial.innerHTML = "";
+    // 2. Limpiar el mensaje de "Esperando..." en el primer registro
+    if (memoriaPacientes.length === 0) {
+        lista.innerHTML = "";
+    }
+
+    // 3. Crear el nuevo elemento de la lista
     const li = document.createElement('li');
-    li.innerHTML = `<strong>Diente ${diente}:</strong> Registrado ✅`;
-    listaHistorial.prepend(li);
+    li.style.padding = "10px";
+    li.style.borderBottom = "1px solid #eee";
+    li.style.display = "flex";
+    li.style.justifyContent = "space-between";
+    
+    // Obtenemos un resumen rápido (ej: NIC del punto medio vestibular)
+    const nicMedio = document.getElementById('v-m-nic').value || "0";
+    
+    li.innerHTML = `
+        <span><strong>Diente ${diente}</strong></span>
+        <span style="color: #28a745;">Registrado ✅ (NIC: ${nicMedio}mm)</span>
+    `;
 
-    // Pasar al siguiente
+    // 4. Agregar al inicio de la lista
+    lista.prepend(li);
+
+    // 5. Guardar en la memoria interna
+    memoriaPacientes.push({ diente: diente, fecha: new Date().toLocaleTimeString() });
+
+    // 6. Pasar al siguiente diente de la secuencia
     indiceActual++;
     if (indiceActual < secuenciaDientes.length) {
         dienteLabel.innerText = "Diente: " + secuenciaDientes[indiceActual];
         limpiarTabla();
+        status.innerText = "Diente " + diente + " guardado. Pasando al " + secuenciaDientes[indiceActual];
     } else {
-        alert("¡Examen completado!");
-        indiceActual = 0;
+        alert("¡Has completado todos los dientes de la secuencia!");
     }
 }
-
 function limpiarTabla() {
     document.querySelectorAll('input[type="number"]').forEach(input => input.value = 0);
     document.querySelectorAll('.rec-val').forEach(td => td.innerText = "0");
@@ -130,4 +147,5 @@ function actualizarGraficoLateral(cara) {
     document.getElementById('linea-recesion').setAttribute('points', cR);
     document.getElementById('linea-sondaje').setAttribute('points', cP);
 }
+
 
