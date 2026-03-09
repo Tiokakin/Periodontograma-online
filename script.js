@@ -67,18 +67,29 @@ recognition.onresult = (event) => {
 
 function guardarDienteActual() {
     const diente = secuenciaDientes[indiceActual];
-    const lista = document.getElementById('lista-historial');
+    
+    // Capturamos todos los valores de la tabla para este diente
+    const registro = {
+        diente: diente,
+        v: {
+            d: { nic: document.getElementById('v-d-nic').value, ps: document.getElementById('v-d-ps').value, ss: document.getElementById('v-d-ss').checked },
+            m: { nic: document.getElementById('v-m-nic').value, ps: document.getElementById('v-m-ps').value, ss: document.getElementById('v-m-ss').checked },
+            mes: { nic: document.getElementById('v-mes-nic').value, ps: document.getElementById('v-mes-ps').value, ss: document.getElementById('v-mes-ss').checked }
+        },
+        p: {
+            d: { nic: document.getElementById('p-d-nic').value, ps: document.getElementById('p-d-ps').value, ss: document.getElementById('p-d-ss').checked },
+            m: { nic: document.getElementById('p-m-nic').value, ps: document.getElementById('p-m-ps').value, ss: document.getElementById('p-m-ss').checked },
+            mes: { nic: document.getElementById('p-mes-nic').value, ps: document.getElementById('p-mes-mes').value, ss: document.getElementById('p-mes-ss').checked }
+        }
+    };
 
-    // 1. Verificar si la lista existe en la web
-    if (!lista) {
-        console.error("No se encontró el elemento lista-historial");
-        return;
-    }
-
-    // 2. Limpiar el mensaje de "Esperando..." en el primer registro
-    if (memoriaPacientes.length === 0) {
-        lista.innerHTML = "";
-    }
+    memoriaPacientes.push(registro);
+    
+    // (Aquí sigue tu lógica de actualizar lista visual y pasar al siguiente diente...)
+    actualizarListaVisual(diente);
+    indiceActual++;
+    // ...
+}
 
     // 3. Crear el nuevo elemento de la lista
     const li = document.createElement('li');
@@ -147,5 +158,6 @@ function actualizarGraficoLateral(cara) {
     document.getElementById('linea-recesion').setAttribute('points', cR);
     document.getElementById('linea-sondaje').setAttribute('points', cP);
 }
+
 
 
