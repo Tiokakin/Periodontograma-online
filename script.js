@@ -10,6 +10,12 @@ document.addEventListener('DOMContentLoaded', () => {
     let indiceActual = 0;
     let memoriaPacientes = [];
 
+    // Diccionario para convertir palabras a números (Acento Chileno)
+    const palabrasANumeros = {
+        'uno': 1, 'dos': 2, 'tres': 3, 'cuatro': 4, 'cinco': 5, 
+        'seis': 6, 'siete': 7, 'ocho': 8, 'nueve': 9, 'cero': 0
+    };
+
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     const recognition = new SpeechRecognition ? new SpeechRecognition() : null;
 
@@ -23,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         recognition.onstart = () => {
-            status.innerText = "🎤 Escuchando... Di cara y números.";
+            status.innerText = "🎤 ESCUCHANDO... Di la cara y los 6 números.";
             btnVoz.style.background = "#dc3545";
             btnVoz.innerText = "🛑 Detener Dictado";
         };
@@ -45,16 +51,11 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-    // --- EL TRADUCTOR (La parte que estaba fallando) ---
     function procesarTextoPeriodontal(texto) {
-        // 1. Detectar Diente
-        const matchDiente = texto.match(/diente\s*(\d)[\s.]?(\d)/);
+        // 1. Detectar Diente (ej: "Diente 1.6" o "Diente uno seis")
+        const matchDiente = texto.match(/diente\s*(\d|uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve)[\s.]?(\d|uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve)/);
         if (matchDiente) {
-            const nuevoDiente = `${matchDiente[1]}.${matchDiente[2]}`;
-            dienteLabel.innerText = "Diente: " + nuevoDiente;
-            // Opcional: buscar el índice en la secuencia
-            const idx = secuenciaDientes.indexOf(nuevoDiente);
-            if(idx !== -1) indiceActual = idx;
+            dienteLabel.innerText = "Diente: " + texto.match(/diente\s*[\d.]+/);
         }
 
         // 2. Detectar Cara
@@ -63,19 +64,27 @@ document.addEventListener('DOMContentLoaded', () => {
         else if (texto.includes("palatino") || texto.includes("lingual")) cara = "p";
 
         if (cara) {
-            // Extraer solo los números después de la palabra de la cara
             const partes = texto.split(/vestibular|palatino|lingual/);
-            const numeros = partes[1].match(/\d/g);
-            
-            const ss = partes[1].includes("sangre") || partes[1].includes("sangrado");
-            const sup = partes[1].includes("pus") || partes[1].includes("supuración");
+            const contenido = partes[1];
+
+            // Convertir palabras a números y limpiar el texto
+            let textoLimpio = contenido;
+            for (let [palabra, num] of Object.entries(palabrasANumeros)) {
+                textoLimpio = textoLimpio.replace(new RegExp(palabra, 'g'), num);
+            }
+
+            const numeros = textoLimpio.match(/\d/g);
+            const ss = contenido.includes("sangre") || contenido.includes("sangrado");
+            const sup = contenido.includes("pus") || contenido.includes("supuración");
 
             if (numeros && numeros.length >= 6) {
-                // Asignar: los 3 primeros son NIC, los otros 3 son PS
+                // NIC (Distal, Medio, Mesial) + PS (Distal, Medio, Mesial)
                 asignar(cara, 'd', numeros[0], numeros[3], ss, sup);
                 asignar(cara, 'm', numeros[1], numeros[4], ss, sup);
                 asignar(cara, 'mes', numeros[2], numeros[5], ss, sup);
                 actualizarGrafico(cara);
+            } else {
+                status.innerText = "⚠️ Error: Necesito 6 números (3 NIC y 3 PS). Escuché " + (numeros ? numeros.length : 0);
             }
         }
     }
@@ -90,17 +99,17 @@ document.addEventListener('DOMContentLoaded', () => {
         if (iNic && iPs) {
             iNic.value = nic;
             iPs.value = ps;
+            // Cálculo: REC = NIC - PS
             const rec = parseInt(nic) - parseInt(ps);
             tRec.innerText = rec;
             if(cSs) cSs.checked = ss;
             if(cSup) cSup.checked = sup;
 
-            // Color de alerta NIC >= 5
+            // Alerta visual de severidad
             iNic.style.backgroundColor = (parseInt(nic) >= 5) ? "#ffdce0" : "white";
         }
     }
 
-    // --- GRÁFICO ---
     function actualizarGrafico(cara) {
         const pts = ['d', 'm', 'mes'];
         let cR = "", cP = "";
@@ -116,28 +125,18 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('linea-sondaje').setAttribute('points', cP);
     }
 
-    // --- GUARDAR ---
+    // --- FUNCIONES DE GUARDADO Y PDF (Igual que antes) ---
     btnGuardar.onclick = guardarDienteActual;
 
     function guardarDienteActual() {
         const diente = secuenciaDientes[indiceActual];
         const registro = {
             diente: diente,
-            v: {
-                d: document.getElementById('v-d-ps').value,
-                m: document.getElementById('v-m-ps').value,
-                mes: document.getElementById('v-mes-ps').value
-            },
-            p: {
-                d: document.getElementById('p-d-ps').value,
-                m: document.getElementById('p-m-ps').value,
-                mes: document.getElementById('p-mes-ps').value
-            }
+            v: { d: document.getElementById('v-d-ps').value, m: document.getElementById('v-m-ps').value, mes: document.getElementById('v-mes-ps').value },
+            p: { d: document.getElementById('p-d-ps').value, m: document.getElementById('p-m-ps').value, mes: document.getElementById('p-mes-ps').value }
         };
-
         memoriaPacientes.push(registro);
         
-        // Historial visual
         if (memoriaPacientes.length === 1) listaHistorial.innerHTML = "";
         const li = document.createElement('li');
         li.innerHTML = `<strong>Diente ${diente}</strong>: Registrado ✅`;
@@ -147,8 +146,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (indiceActual < secuenciaDientes.length) {
             dienteLabel.innerText = "Diente: " + secuenciaDientes[indiceActual];
             limpiarCampos();
-        } else {
-            alert("Sesión finalizada.");
         }
     }
 
@@ -158,18 +155,15 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('input[type="checkbox"]').forEach(c => c.checked = false);
     }
 
-    // --- PDF ---
     btnPdf.onclick = () => {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
-        doc.setFontSize(16);
-        doc.text("Reporte Periodontal - Investigación", 20, 20);
+        doc.text("Reporte Periodontal Profesional", 20, 20);
         let y = 35;
         memoriaPacientes.forEach(item => {
-            doc.text(`Diente ${item.diente}: Vest(${item.v.d}-${item.v.m}-${item.v.mes}) Palat(${item.p.d}-${item.p.m}-${item.p.mes})`, 20, y);
+            doc.text(`Diente ${item.diente}: V(${item.v.d}-${item.v.m}-${item.v.mes}) P(${item.p.d}-${item.p.m}-${item.p.mes})`, 20, y);
             y += 10;
-            if (y > 270) { doc.addPage(); y = 20; }
         });
-        doc.save("periodontograma_u_chile.pdf");
+        doc.save("registro_investigacion.pdf");
     };
 });
