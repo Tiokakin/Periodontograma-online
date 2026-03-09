@@ -3,102 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PeriodontoVoice Pro v0.0011</title>
+    <title>PeriodontoVoice Pro v0.0116</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
     <header>
-        <h1>Asistente Periodontal 🦷</h1>
-        <p id="status">Estado: Listo para trabajar</p>
+        <h1>PeriodontoVoice Pro 🦷</h1>
+        <div class="paciente-info">
+            <input type="text" id="nombre-paciente" placeholder="Nombre del Paciente...">
+            <p id="status">Estado: Listo</p>
+        </div>
     </header>
 
-    <div class="botones-control">
-        <button id="btn-voz">🎤 Iniciar Dictado</button>
-        <button id="btn-guardar">💾 Guardar Diente</button>
-        <button id="btn-pdf">📄 Generar Informe PDF</button>
+    <div class="controles-principales">
+        <button id="btn-voz" class="btn-verde">🎤 Iniciar Dictado</button>
+        <button id="btn-guardar" class="btn-azul">💾 Guardar Diente</button>
+        <button id="btn-pdf" class="btn-rojo">📄 Generar PDF</button>
     </div>
 
     <main>
         <div class="ficha-clinica">
             <h2 id="diente-actual">Diente: 1.8</h2>
 
-           <div class="grafico-container">
-    <h3 style="font-size: 0.8rem; color: #666; margin: 0;">Perfil Periodontal Dinámico</h3>
-    <svg id="periodontograma-svg" viewBox="0 0 300 200">
-        <g id="silueta-diente" fill="#f0f0f0" stroke="#ccc" stroke-width="1">
-            <path id="forma-diente" d="M80,50 Q80,20 150,20 Q220,20 220,50 L220,80 Q220,150 180,180 L150,150 L120,180 Q80,150 80,80 Z" />
-        </g>
-        
-        <line x1="10" y1="85" x2="290" y2="85" stroke="#bbb" stroke-width="1" stroke-dasharray="2" />
-        
-        <polyline id="linea-recesion" fill="none" stroke="blue" stroke-width="3" points="50,85 150,85 250,85" />
-        <polyline id="linea-sondaje" fill="none" stroke="red" stroke-width="3" points="50,85 150,85 250,85" />
-    </svg>
-</div>
+            <div class="grafico-container">
+                <svg id="periodontograma-svg" viewBox="0 0 300 200">
+                    <g id="silueta-diente" fill="#f9f9f9" stroke="#ddd" stroke-width="1">
+                        <path id="forma-diente" d="M80,50 Q80,20 150,20 Q220,20 220,50 L220,80 Q220,150 180,180 L150,150 L120,180 Q80,150 80,80 Z" />
+                    </g>
+                    <line x1="10" y1="85" x2="290" y2="85" stroke="#bbb" stroke-width="1" stroke-dasharray="2" />
+                    <polyline id="linea-recesion" fill="none" stroke="blue" stroke-width="3" points="50,85 150,85 250,85" />
+                    <polyline id="linea-sondaje" fill="none" stroke="red" stroke-width="3" points="50,85 150,85 250,85" />
+                </svg>
+            </div>
 
             <div class="tabla-scroll">
                 <table>
                     <thead>
-                        <tr>
-                            <th>Cara</th>
-                            <th>Pto</th>
-                            <th>NIC</th>
-                            <th>PS</th>
-                            <th>REC</th>
-                            <th>SS</th>
-                            <th>SUP</th>
-                        </tr>
+                        <tr><th>Cara</th><th>Pto</th><th>NIC</th><th>PS</th><th>REC</th><th>SS</th></tr>
                     </thead>
-                    <tbody>
+                    <tbody id="cuerpo-tabla">
                         <tr class="v-row">
-                            <td rowspan="3" class="etiqueta-cara">V</td>
-                            <td>D</td>
+                            <td rowspan="3">V</td><td>D</td>
                             <td><input type="number" id="v-d-nic" value="0"></td>
                             <td><input type="number" id="v-d-ps" value="0"></td>
                             <td id="v-d-rec" class="rec-val">0</td>
                             <td><input type="checkbox" id="v-d-ss"></td>
-                            <td><input type="checkbox" id="v-d-sup"></td>
                         </tr>
-                        <tr class="v-row">
-                            <td>M</td>
+                        <tr class="v-row"><td>M</td>
                             <td><input type="number" id="v-m-nic" value="0"></td>
                             <td><input type="number" id="v-m-ps" value="0"></td>
                             <td id="v-m-rec" class="rec-val">0</td>
                             <td><input type="checkbox" id="v-m-ss"></td>
-                            <td><input type="checkbox" id="v-m-sup"></td>
                         </tr>
-                        <tr class="v-row">
-                            <td>Mes</td>
+                        <tr class="v-row"><td>Mes</td>
                             <td><input type="number" id="v-mes-nic" value="0"></td>
                             <td><input type="number" id="v-mes-ps" value="0"></td>
                             <td id="v-mes-rec" class="rec-val">0</td>
                             <td><input type="checkbox" id="v-mes-ss"></td>
-                            <td><input type="checkbox" id="v-mes-sup"></td>
                         </tr>
                         <tr class="p-row-divider">
-                            <td rowspan="3" class="etiqueta-cara">P/L</td>
-                            <td>D</td>
+                            <td rowspan="3">P/L</td><td>D</td>
                             <td><input type="number" id="p-d-nic" value="0"></td>
                             <td><input type="number" id="p-d-ps" value="0"></td>
                             <td id="p-d-rec" class="rec-val">0</td>
                             <td><input type="checkbox" id="p-d-ss"></td>
-                            <td><input type="checkbox" id="p-d-sup"></td>
                         </tr>
-                        <tr class="p-row">
-                            <td>M</td>
+                        <tr class="p-row"><td>M</td>
                             <td><input type="number" id="p-m-nic" value="0"></td>
                             <td><input type="number" id="p-m-ps" value="0"></td>
                             <td id="p-m-rec" class="rec-val">0</td>
                             <td><input type="checkbox" id="p-m-ss"></td>
-                            <td><input type="checkbox" id="p-m-sup"></td>
                         </tr>
-                        <tr class="p-row">
-                            <td>Mes</td>
+                        <tr class="p-row"><td>Mes</td>
                             <td><input type="number" id="p-mes-nic" value="0"></td>
                             <td><input type="number" id="p-mes-ps" value="0"></td>
                             <td id="p-mes-rec" class="rec-val">0</td>
                             <td><input type="checkbox" id="p-mes-ss"></td>
-                            <td><input type="checkbox" id="p-mes-sup"></td>
                         </tr>
                     </tbody>
                 </table>
@@ -108,20 +89,16 @@
         <div id="historial-container" class="ficha-clinica">
             <h3>Dientes Registrados:</h3>
             <ul id="lista-historial">
-                <li style="color: #888;">Esperando registros...</li>
+                <li style="color: #888;">No hay registros aún.</li>
             </ul>
         </div>
     </main>
 
     <footer>
-        <p>PeriodontoVoice Pro | Versión: <span id="version-num">0.0014</span></p>
+        <p>Versión Académica: <span id="version-num">0.0116</span></p>
     </footer>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
-
-
-
-
