@@ -19,12 +19,14 @@
         <div class="ficha-clinica">
             <h2 id="diente-actual">Diente: 1.6</h2>
             <div class="grafico-container">
-    <svg id="periodontograma-svg" viewBox="0 0 300 150">
-        <line x1="0" y1="50" x2="300" y2="50" stroke="#ccc" stroke-dasharray="4"/>
+    <h3 style="font-size: 0.8rem; color: #666;">Perfil Periodontal (Cara actual)</h3>
+    <svg id="periodontograma-svg" viewBox="0 0 300 200" preserveAspectRatio="xMidYMid meet">
+        <line x1="10" y1="50" x2="290" y2="50" stroke="#eee" stroke-width="1" />
+        <line x1="10" y1="85" x2="290" y2="85" stroke="#ccc" stroke-width="1" /> <line x1="10" y1="120" x2="290" y2="120" stroke="#eee" stroke-width="1" />
         
-        <polyline id="linea-recesion" fill="none" stroke="blue" stroke-width="2" points="50,50 150,50 250,50" />
+        <polyline id="linea-recesion" fill="none" stroke="blue" stroke-width="3" points="50,85 150,85 250,85" stroke-linejoin="round" />
         
-        <polyline id="linea-sondaje" fill="none" stroke="red" stroke-width="2" points="50,50 150,50 250,50" />
+        <polyline id="linea-sondaje" fill="none" stroke="red" stroke-width="3" points="50,85 150,85 250,85" stroke-linejoin="round" />
     </svg>
 </div>
             <div class="tabla-scroll">
@@ -111,6 +113,7 @@
     </tbody>
 </body>
 </html>
+
 
 
 
