@@ -1,83 +1,148 @@
+/**
+ * PeriodontoVoice Pro - Versión 0.0007
+ * Lógica: NIC = PS + REC | REC = NIC - PS
+ */
+
 const btnVoz = document.getElementById('btn-voz');
 const status = document.getElementById('status');
 const dienteLabel = document.getElementById('diente-actual');
 
+// 1. Configuración del Reconocimiento de Voz
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
 if (!SpeechRecognition) {
-    status.innerText = "Navegador no soporta voz.";
+    status.innerText = "Error: Su navegador no soporta tecnología de voz. Use Chrome.";
 } else {
     const recognition = new SpeechRecognition();
-    recognition.lang = 'es-CL';
+    recognition.lang = 'es-CL'; // Español de Chile
     recognition.continuous = true;
+    recognition.interimResults = false;
 
+    // Control del Botón
     btnVoz.onclick = () => {
-        try {
-            recognition.start();
-            status.innerText = "🎤 Escuchando...";
-            btnVoz.style.background = "#dc3545";
-            btnVoz.innerText = "🛑 Detener";
-        } catch (e) {
+        if (btnVoz.innerText.includes("Iniciar")) {
+            try {
+                recognition.start();
+            } catch (err) {
+                console.error("Error al iniciar:", err);
+            }
+        } else {
             recognition.stop();
-            btnVoz.style.background = "#28a745";
-            btnVoz.innerText = "🎤 Iniciar Dictado";
         }
     };
 
+    // Eventos de Estado
+    recognition.onstart = () => {
+        status.innerText = "🎤 ESCUCHANDO... Di el diente y luego la cara con sus 6 números.";
+        btnVoz.style.background = "#dc3545";
+        btnVoz.innerText = "🛑 Detener Dictado";
+    };
+
+    recognition.onend = () => {
+        status.innerText = "Micrófono desactivado.";
+        btnVoz.style.background = "#28a745";
+        btnVoz.innerText = "🎤 Iniciar Dictado";
+    };
+
+    recognition.onerror = (event) => {
+        console.error("Error de reconocimiento:", event.error);
+        status.innerText = "❌ Error: " + event.error;
+    };
+
+    // 2. Procesamiento de la Voz
     recognition.onresult = (event) => {
         const transcript = event.results[event.results.length - 1][0].transcript.toLowerCase();
         status.innerText = "Escuché: " + transcript;
-        procesarComando(transcript);
-    };
-
-    function procesarComando(texto) {
-        // DIENTE
-        const matchDiente = texto.match(/diente\s*(\d)[\s.]?(\d)/);
+        
+        // A. Reconocer el Diente (Ej: "diente uno punto seis")
+        const matchDiente = transcript.match(/diente\s*(\d)[\s.]?(\d)/);
         if (matchDiente) {
             dienteLabel.innerText = `Diente: ${matchDiente[1]}.${matchDiente[2]}`;
         }
 
-        // CARA
-        let cara = texto.includes("vestibular") ? "v" : (texto.includes("palatino") || texto.includes("lingual") ? "p" : null);
-        
-        if (cara) {
-            const parteCara = texto.split(/vestibular|palatino|lingual/)[1];
-            const numeros = parteCara.match(/\d/g);
-            const ss = parteCara.includes("sangre") || parteCara.includes("sangrado");
-            const sup = parteCara.includes("pus") || parteCara.includes("supuración");
+        // B. Reconocer Cara y Mediciones
+        // Dividimos el texto para evitar que los números del diente ensucien las medidas
+        let caraIdentificada = null;
+        if (transcript.includes("vestibular")) caraIdentificada = "v";
+        else if (transcript.includes("palatino") || transcript.includes("lingual")) caraIdentificada = "p";
+
+        if (caraIdentificada) {
+            const partes = transcript.split(/vestibular|palatino|lingual/);
+            const datosPostCara = partes[1]; // Todo lo que se dijo después de la palabra de la cara
+            
+            const numeros = datosPostCara.match(/\d/g);
+            const tieneSangrado = datosPostCara.includes("sangre") || datosPostCara.includes("sangrado");
+            const tieneSupuracion = datosPostCara.includes("pus") || datosPostCara.includes("supuración") || datosPostCara.includes("supuracion");
 
             if (numeros && numeros.length >= 6) {
-                asignar(cara, 'd', numeros[0], numeros[3], ss, sup);
-                asignar(cara, 'm', numeros[1], numeros[4], ss, sup);
-                asignar(cara, 'mes', numeros[2], numeros[5], ss, sup);
-                actualizarGrafico(cara);
+                // Según tu orden: 3 para NIC y 3 para PS (Distal, Medio, Mesial)
+                asignarYCalcular(caraIdentificada, 'd', numeros[0], numeros[3], tieneSangrado, tieneSupuracion);
+                asignarYCalcular(caraIdentificada, 'm', numeros[1], numeros[4], tieneSangrado, tieneSupuracion);
+                asignarYCalcular(caraIdentificada, 'mes', numeros[2], numeros[5], tieneSangrado, tieneSupuracion);
+                
+                // Actualizar Gráfico
+                actualizarGraficoLateral(caraIdentificada);
             }
         }
-    }
+    };
+}
 
-    function asignar(c, p, nic, ps, ss, sup) {
-        document.getElementById(`${c}-${p}-nic`).value = nic;
-        document.getElementById(`${c}-${p}-ps`).value = ps;
-        const rec = parseInt(nic) - parseInt(ps);
-        document.getElementById(`${c}-${p}-rec`).innerText = rec;
-        document.getElementById(`${c}-${p}-ss`).checked = ss;
-        document.getElementById(`${c}-${p}-sup`).checked = sup;
+// 3. Funciones de actualización de Interfaz
+function asignarYCalcular(cara, punto, nic, ps, ss, sup) {
+    try {
+        const idBase = `${cara}-${punto}`;
+        const inputNic = document.getElementById(`${idBase}-nic`);
+        const inputPs = document.getElementById(`${idBase}-ps`);
+        const tdRec = document.getElementById(`${idBase}-rec`);
+        const checkSs = document.getElementById(`${idBase}-ss`);
+        const checkSup = document.getElementById(`${idBase}-sup`);
+
+        if (inputNic && inputPs) {
+            inputNic.value = nic;
+            inputPs.value = ps;
+            
+            // Cálculo clínico: REC = NIC - PS
+            const recCalculado = parseInt(nic) - parseInt(ps);
+            tdRec.innerText = recCalculado;
+
+            // Checkboxes
+            if (checkSs) checkSs.checked = ss;
+            if (checkSup) checkSup.checked = sup;
+
+            // Alertas visuales (AAP 2017)
+            inputNic.style.backgroundColor = (nic >= 5) ? "#ffdce0" : "#ffffff";
+            inputNic.parentElement.parentElement.style.backgroundColor = ss ? "#fff0f0" : "transparent";
+        }
+    } catch (err) {
+        console.error("Error en asignación:", err);
+    }
+}
+
+// 4. Dibujo Dinámico del Periodontograma (SVG)
+function actualizarGraficoLateral(cara) {
+    const puntosClave = ['d', 'm', 'mes'];
+    let polyPointsRec = "";
+    let polyPointsPs = "";
+
+    puntosClave.forEach((p, i) => {
+        const x = 50 + (i * 100); // Coordenadas X: 50, 150, 250
         
-        document.getElementById(`${c}-${p}-nic`).style.backgroundColor = (nic >= 5) ? "#ffdce0" : "white";
-    }
+        const psVal = parseInt(document.getElementById(`${cara}-${p}-ps`).value) || 0;
+        const recVal = parseInt(document.getElementById(`${cara}-${p}-rec`).innerText) || 0;
 
-    function actualizarGrafico(cara) {
-        const pts = ['d', 'm', 'mes'];
-        let cR = "", cP = "";
-        pts.forEach((p, i) => {
-            const x = 50 + (i * 100);
-            const ps = parseInt(document.getElementById(`${cara}-${p}-ps`).value) || 0;
-            const rec = parseInt(document.getElementById(`${cara}-${p}-rec`).innerText) || 0;
-            const yR = 85 + (rec * 7);
-            const yP = yR + (ps * 7);
-            cR += `${x},${yR} `; cP += `${x},${yP} `;
-        });
-        document.getElementById('linea-recesion').setAttribute('points', cR);
-        document.getElementById('linea-sondaje').setAttribute('points', cP);
+        // Escala visual: 1mm = 7 pixeles. Línea base 0 en Y=85
+        const yMargen = 85 + (recVal * 7); 
+        const yBolsa = yMargen + (psVal * 7);
+
+        polyPointsRec += `${x},${yMargen} `;
+        polyPointsPs += `${x},${yBolsa} `;
+    });
+
+    const lineaRec = document.getElementById('linea-recesion');
+    const lineaPs = document.getElementById('linea-sondaje');
+
+    if (lineaRec && lineaPs) {
+        lineaRec.setAttribute('points', polyPointsRec.trim());
+        lineaPs.setAttribute('points', polyPointsPs.trim());
     }
 }
