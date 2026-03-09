@@ -38,39 +38,58 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-    // --- ANCLA: PROCESADOR ---
-    function procesarComandos(texto) {
-        // Reconocimiento de Diente
-        const matchDiente = texto.match(/diente\s*(\d|uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve)[\s.]?(\d|uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve)/);
-        if (matchDiente) {
-            const num = texto.match(/diente\s*[\d.]+/)[0].replace("diente ", "");
-            dienteLabel.innerText = "Diente: " + num;
-            actualizarSiluetaDiente(num);
+   // --- ANCLA: PROCESADOR (Versión 0.0117 con Tolerancia Fonética) ---
+function procesarComandos(texto) {
+    // 1. Detección de Diente (Igual que antes)
+    const matchDiente = texto.match(/diente\s*(\d|uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve)[\s.]?(\d|uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve)/);
+    if (matchDiente) {
+        const num = texto.match(/diente\s*[\d.]+/)[0].replace("diente ", "");
+        dienteLabel.innerText = "Diente: " + num;
+        actualizarSiluetaDiente(num);
+    }
+
+    // 2. Detección de Cara con Tolerancia Fonética
+    let cara = null;
+    
+    // Lista de errores comunes para Vestibular
+    const esVestibular = texto.includes("vestibular") || texto.includes("estibular") || texto.includes("testicular");
+    
+    // Lista de errores comunes para Palatino/Lingual
+    const esPalatino = texto.includes("palatino") || texto.includes("latino") || 
+                       texto.includes("platino") || texto.includes("lingual") || 
+                       texto.includes("palatal");
+
+    if (esVestibular) cara = "v";
+    else if (esPalatino) cara = "p";
+
+    if (cara) {
+        // Usamos una expresión regular para separar el texto después de la palabra clave detectada
+        const separador = cara === "v" ? /(vestibular|estibular|testicular)/ : /(palatino|latino|platino|lingual|palatal)/;
+        let textoLimpio = texto.split(separador).pop(); 
+
+        for (let [p, n] of Object.entries(palabrasANumeros)) { 
+            textoLimpio = textoLimpio.replace(new RegExp(p, 'g'), n); 
         }
+        
+        const nums = textoLimpio.match(/\d/g);
+        const ss = textoLimpio.includes("sangre") || textoLimpio.includes("sangrado");
 
-        // Reconocimiento de Cara y Números
-        let cara = texto.includes("vestibular") ? "v" : (texto.includes("palatino") || texto.includes("lingual") ? "p" : null);
-        if (cara) {
-            let textoLimpio = texto.split(cara === "v" ? "vestibular" : "palatino")[1];
-            for (let [p, n] of Object.entries(palabrasANumeros)) { textoLimpio = textoLimpio.replace(new RegExp(p, 'g'), n); }
-            
-            const nums = textoLimpio.match(/\d/g);
-            const ss = textoLimpio.includes("sangre") || textoLimpio.includes("sangrado");
+        if (nums && nums.length >= 6) {
+            asignarValores(cara, 'd', nums[0], nums[3], ss);
+            asignarValores(cara, 'm', nums[1], nums[4], ss);
+            asignarValores(cara, 'mes', nums[2], nums[5], ss);
+            actualizarGrafico(cara);
 
-            if (nums && nums.length >= 6) {
-                asignarValores(cara, 'd', nums[0], nums[3], ss);
-                asignarValores(cara, 'm', nums[1], nums[4], ss);
-                asignarValores(cara, 'mes', nums[2], nums[5], ss);
-                actualizarGrafico(cara);
-
-                // AUTO-GUARDADO TRAS PALATINO
-                if (cara === 'p') {
-                    status.innerText = "✅ Palatino detectado. Guardando...";
-                    setTimeout(ejecutarGuardado, 1500);
-                }
+            // AUTO-GUARDADO TRAS CARA INTERNA
+            if (cara === 'p') {
+                status.innerText = "✅ Cara interna detectada. Guardando...";
+                setTimeout(ejecutarGuardado, 1500);
             }
+        } else {
+            status.innerText = "⚠️ Error: Escuché la cara pero solo " + (nums ? nums.length : 0) + " números.";
         }
     }
+}
 
     // --- ANCLA: TABLA ---
     function asignarValores(c, p, nic, ps, ss) {
@@ -143,3 +162,4 @@ document.addEventListener('DOMContentLoaded', () => {
         doc.save(`Examen_${nombre}.pdf`);
     };
 });
+
