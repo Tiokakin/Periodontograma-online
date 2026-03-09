@@ -123,5 +123,22 @@ input[type="checkbox"] {
 .sangrado-activo {
     background-color: #fff0f0;
 }
+.grafico-container {
+    background: white;
+    border: 1px solid #ddd;
+    margin: 10px 0;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+#periodontograma-svg {
+    width: 100%;
+    height: auto;
+    background: #fafafa;
+}
+
+footer #version-num {
+    color: #28a745; /* Cambiamos color para notar el cambio */
+}
 
 
