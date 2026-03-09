@@ -22,16 +22,19 @@
         <div class="ficha-clinica">
             <h2 id="diente-actual">Diente: 1.8</h2>
 
-            <div class="grafico-container">
-                <h3 style="font-size: 0.8rem; color: #666; margin-bottom: 5px;">Perfil de Cara Actual</h3>
-                <svg id="periodontograma-svg" viewBox="0 0 300 200">
-                    <line x1="10" y1="85" x2="290" y2="85" stroke="#ccc" stroke-width="1" />
-                    <polyline id="linea-recesion" fill="none" stroke="blue" stroke-width="3" points="50,85 150,85 250,85" />
-                    <polyline id="linea-sondaje" fill="none" stroke="red" stroke-width="3" points="50,85 150,85 250,85" />
-                </svg>
-            </div>
-
-            
+           <div class="grafico-container">
+    <h3 style="font-size: 0.8rem; color: #666; margin: 0;">Perfil Periodontal Dinámico</h3>
+    <svg id="periodontograma-svg" viewBox="0 0 300 200">
+        <g id="silueta-diente" fill="#f0f0f0" stroke="#ccc" stroke-width="1">
+            <path id="forma-diente" d="M80,50 Q80,20 150,20 Q220,20 220,50 L220,80 Q220,150 180,180 L150,150 L120,180 Q80,150 80,80 Z" />
+        </g>
+        
+        <line x1="10" y1="85" x2="290" y2="85" stroke="#bbb" stroke-width="1" stroke-dasharray="2" />
+        
+        <polyline id="linea-recesion" fill="none" stroke="blue" stroke-width="3" points="50,85 150,85 250,85" />
+        <polyline id="linea-sondaje" fill="none" stroke="red" stroke-width="3" points="50,85 150,85 250,85" />
+    </svg>
+</div>
 
             <div class="tabla-scroll">
                 <table>
@@ -118,6 +121,7 @@
     <script src="script.js"></script>
 </body>
 </html>
+
 
 
 
