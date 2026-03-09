@@ -18,16 +18,12 @@
     <main>
         <div class="ficha-clinica">
             <h2 id="diente-actual">Diente: --</h2>
+            
 
-            <div class="grafico-container">
-                <h3 style="font-size: 0.8rem; color: #666; margin: 0 0 5px 0;">Perfil Periodontal (Cara actual)</h3>
-                <svg id="periodontograma-svg" viewBox="0 0 300 200">
-                    <line x1="10" y1="85" x2="290" y2="85" stroke="#ccc" stroke-width="1" />
-                    <polyline id="linea-recesion" fill="none" stroke="blue" stroke-width="3" points="50,85 150,85 250,85" />
-                    <polyline id="linea-sondaje" fill="none" stroke="red" stroke-width="3" points="50,85 150,85 250,85" />
-                </svg>
-            </div>
-
+         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+    <h2 id="diente-actual" style="margin: 0;">Diente: 1.8</h2>
+    <button id="btn-guardar" style="background: #007bff; color: white; border: none; padding: 12px 20px; border-radius: 8px; font-weight: bold; cursor: pointer;">💾 Guardar Diente</button>
+</div>
             <div class="tabla-scroll">
                 <table>
                     <thead>
@@ -96,14 +92,21 @@
                 </table>
             </div>
         </div>
+        <div id="historial-container" class="ficha-clinica" style="margin-top: 20px; border-top: 3px solid #28a745;">
+    <h3 style="font-size: 1rem; color: #333;">Dientes Registrados en esta Sesión:</h3>
+    <ul id="lista-historial" style="text-align: left; list-style: none; padding: 0; max-height: 200px; overflow-y: auto;">
+        <li style="color: #888; font-style: italic;">Esperando primer registro...</li>
+    </ul>
+</div>
     </main>
 
     <footer>
-        <p>Desarrollado para Investigación Dental | Versión: <span id="version-num">0.0008</span></p>
+        <p>Desarrollado para Investigación Dental | Versión: <span id="version-num">0.0009</span></p>
     </footer>
 
     <script src="script.js"></script>
 </body>
 </html>
+
 
 
