@@ -53,32 +53,53 @@ recognition.onresult = (event) => {
             asignarDatos(cara, 'mes', numeros[2], numeros[5], tieneSangrado, tieneSupuracion);
         }
     }
-};
-
-function asignarDatos(cara, punto, nic, ps, ss, sup) {
+}function asignarDatos(cara, punto, nic, ps, ss, sup) {
     const inputNic = document.getElementById(`${cara}-${punto}-nic`);
     const inputPs = document.getElementById(`${cara}-${punto}-ps`);
-    const checkSs = document.getElementById(`${cara}-${punto}-ss`);
-    const checkSup = document.getElementById(`${cara}-${punto}-sup`);
     const tdRec = document.getElementById(`${cara}-${punto}-rec`);
 
     if (inputNic && inputPs) {
-        // Insertar valores numéricos
         inputNic.value = nic;
         inputPs.value = ps;
         
-        // Calcular Recesión (NIC - PS)
         const rec = parseInt(nic) - parseInt(ps);
         tdRec.innerText = rec;
 
-        // Marcar Sangrado y Supuración (Checkboxes)
-        if (checkSs) checkSs.checked = ss;
-        if (checkSup) checkSup.checked = sup;
-
-        // Alerta visual de severidad (NIC >= 5mm)
-        inputNic.style.backgroundColor = (nic >= 5) ? "#ffdce0" : "#ffffff";
+        // --- NUEVA LÓGICA DE DIBUJO ---
+        actualizarGrafico();
         
-        // Resaltar fila si hay sangrado activo
-        inputNic.parentElement.parentElement.style.backgroundColor = ss ? "#fff0f0" : "transparent";
+        // Alerta visual de severidad
+        inputNic.style.backgroundColor = (nic >= 5) ? "#ffdce0" : "#ffffff";
     }
 }
+
+function actualizarGrafico() {
+    // Obtenemos los valores de los 3 puntos de la cara actual (ej: Vestibular)
+    const puntos = ['d', 'm', 'mes'];
+    let puntosRec = "";
+    let puntosPs = "";
+
+    puntos.forEach((p, index) => {
+        const x = 50 + (index * 100); // Coordenada X (Distal, Medio, Mesial)
+        
+        // Obtenemos valores de la web (si están vacíos, usamos 0)
+        const vPs = parseInt(document.getElementById(`v-${p}-ps`).value) || 0;
+        const vRec = parseInt(document.getElementById(`v-${p}-rec`).innerText) || 0;
+
+        // Calculamos la altura Y (50 es la base, sumamos para bajar la línea)
+        const yRec = 50 + (vRec * 5); 
+        const yPs = 50 + ((vRec + vPs) * 5); // El sondaje empieza donde termina la recesión
+
+        puntosRec += `${x},${yRec} `;
+        puntosPs += `${x},${yPs} `;
+    });
+
+    // Actualizamos las líneas del dibujo SVG
+    document.getElementById('linea-recesion').setAttribute('points', puntosRec);
+    document.getElementById('linea-sondaje').setAttribute('points', puntosPs);
+}
+
+
+    }
+}
+
