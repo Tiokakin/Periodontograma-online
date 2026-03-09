@@ -53,45 +53,55 @@ recognition.onresult = (event) => {
             asignarDatos(cara, 'mes', numeros[2], numeros[5], tieneSangrado, tieneSupuracion);
         }
     }
-}function asignarDatos(cara, punto, nic, ps, ss, sup) {
+function asignarDatos(cara, punto, nic, ps, ss, sup) {
     const inputNic = document.getElementById(`${cara}-${punto}-nic`);
     const inputPs = document.getElementById(`${cara}-${punto}-ps`);
     const tdRec = document.getElementById(`${cara}-${punto}-rec`);
+    const checkSs = document.getElementById(`${cara}-${punto}-ss`);
+    const checkSup = document.getElementById(`${cara}-${punto}-sup`);
 
     if (inputNic && inputPs) {
         inputNic.value = nic;
         inputPs.value = ps;
         
+        // Calcular Recesión: NIC = PS + REC -> REC = NIC - PS
         const rec = parseInt(nic) - parseInt(ps);
         tdRec.innerText = rec;
 
-        // --- NUEVA LÓGICA DE DIBUJO ---
-        actualizarGrafico();
+        if (checkSs) checkSs.checked = ss;
+        if (checkSup) checkSup.checked = sup;
+
+        // IMPORTANTE: Pasamos la 'cara' para que el gráfico sepa qué dibujar
+        actualizarGrafico(cara);
         
-        // Alerta visual de severidad
         inputNic.style.backgroundColor = (nic >= 5) ? "#ffdce0" : "#ffffff";
     }
 }
 
-function actualizarGrafico() {
-    // Obtenemos los valores de los 3 puntos de la cara actual (ej: Vestibular)
+function actualizarGrafico(cara) {
     const puntos = ['d', 'm', 'mes'];
-    let puntosRec = "";
-    let puntosPs = "";
+    let coordRec = "";
+    let coordPs = "";
 
     puntos.forEach((p, index) => {
-        const x = 50 + (index * 100); // Coordenada X (Distal, Medio, Mesial)
+        const x = 50 + (index * 100); // Distal: 50, Medio: 150, Mesial: 250
         
-        // Obtenemos valores de la web (si están vacíos, usamos 0)
-        const vPs = parseInt(document.getElementById(`v-${p}-ps`).value) || 0;
-        const vRec = parseInt(document.getElementById(`v-${p}-rec`).innerText) || 0;
+        const psVal = parseInt(document.getElementById(`${cara}-${p}-ps`).value) || 0;
+        const recVal = parseInt(document.getElementById(`${cara}-${p}-rec`).innerText) || 0;
 
-        // Calculamos la altura Y (50 es la base, sumamos para bajar la línea)
-        const yRec = 50 + (vRec * 5); 
-        const yPs = 50 + ((vRec + vPs) * 5); // El sondaje empieza donde termina la recesión
+        // Escalado: Cada 1mm son 7 píxeles en el SVG
+        // La línea base (0) está en Y = 85
+        const yMargen = 85 + (recVal * 7); 
+        const yBolsa = yMargen + (psVal * 7);
 
-        puntosRec += `${x},${yRec} `;
-        puntosPs += `${x},${yPs} `;
+        coordRec += `${x},${yMargen} `;
+        coordPs += `${x},${yBolsa} `;
+    });
+
+    // Actualizamos los puntos de las líneas en el SVG
+    document.getElementById('linea-recesion').setAttribute('points', coordRec.trim());
+    document.getElementById('linea-sondaje').setAttribute('points', coordPs.trim());
+}
     });
 
     // Actualizamos las líneas del dibujo SVG
@@ -102,4 +112,5 @@ function actualizarGrafico() {
 
     }
 }
+
 
