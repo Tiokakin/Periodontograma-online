@@ -158,6 +158,35 @@ function actualizarGraficoLateral(cara) {
     document.getElementById('linea-recesion').setAttribute('points', cR);
     document.getElementById('linea-sondaje').setAttribute('points', cP);
 }
+document.getElementById('btn-pdf').onclick = function() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    doc.setFontSize(18);
+    doc.text("Informe Periodontal - Registro de Voz", 20, 20);
+    doc.setFontSize(12);
+    doc.text(`Fecha: ${new Date().toLocaleDateString()}`, 20, 30);
+    doc.text("--------------------------------------------------", 20, 35);
+
+    let y = 45; // Posición vertical en el PDF
+
+    memoriaPacientes.forEach((item) => {
+        if (y > 270) { doc.addPage(); y = 20; } // Nueva página si se acaba el espacio
+
+        doc.setFont("helvetica", "bold");
+        doc.text(`DIENTE ${item.diente}`, 20, y);
+        y += 7;
+        
+        doc.setFont("helvetica", "normal");
+        doc.text(`Vestibular: Distal(${item.v.d.ps}) Medio(${item.v.m.ps}) Mesial(${item.v.mes.ps})`, 30, y);
+        y += 5;
+        doc.text(`Palatino: Distal(${item.p.d.ps}) Medio(${item.p.m.ps}) Mesial(${item.p.mes.ps})`, 30, y);
+        y += 10; // Espacio entre dientes
+    });
+
+    // Descargar el archivo
+    doc.save(`periodontograma_${new Date().getTime()}.pdf`);
+};
 
 
 
