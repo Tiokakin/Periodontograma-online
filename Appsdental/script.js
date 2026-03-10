@@ -1,3 +1,16 @@
+// Al cargar la app de Periodontograma
+window.addEventListener('load', () => {
+    const datos = JSON.parse(localStorage.getItem('SesionClinica'));
+    
+    if (datos) {
+        // Busca un elemento en tu HTML de periodontograma para mostrar el nombre
+        // Ejemplo: <span id="nombre-paciente"></span>
+        const display = document.getElementById('nombre-paciente');
+        if(display) display.innerText = `Paciente: ${datos.paciente}`;
+        
+        console.log("Sincronizado con paciente:", datos.paciente);
+    }
+});
 document.addEventListener('DOMContentLoaded', () => {
 
     // --- ANCLA: VARIABLES ---
@@ -162,4 +175,5 @@ function procesarComandos(texto) {
         doc.save(`Examen_${nombre}.pdf`);
     };
 });
+
 
