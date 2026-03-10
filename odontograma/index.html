@@ -2,25 +2,34 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Odontograma Voice Pro - Registro Clínico</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Odontograma Voice Pro | Francisco Méndez</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>Odontograma Digital con Voz</h1>
-    <div id="controles">
-        <button id="btn-dictar">🎤 Iniciar Dictado</button>
-        <p id="status">Estado: En espera...</p>
-        <p id="transcripcion">Dijo: "..."</p>
-    </div>
+    <header>
+        <h1>Odontograma Digital Inteligente</h1>
+        <p>Especialidad en Implantología</p>
+    </header>
 
-    <div id="odontograma-container">
+    <main>
+        <div class="panel-control">
+            <button id="btn-voz" class="btn-primario">🎤 Iniciar Dictado</button>
+            <div id="status-box">
+                <span id="indicador"></span>
+                <p id="feedback">Listo para registrar...</p>
+            </div>
         </div>
 
-    <div id="historial-versiones">
-        <h3>Versiones del Odontograma</h3>
-        <ul id="lista-versiones"></ul>
-        <button id="btn-guardar">💾 Guardar Versión Actual</button>
-    </div>
+        <div id="odontograma-grid">
+            </div>
+
+        <section class="versiones-container">
+            <h3>Historial de Versiones (Sincronizado)</h3>
+            <button id="btn-guardar" class="btn-secundario">💾 Guardar Versión Actual</button>
+            <ul id="lista-versiones"></ul>
+        </section>
+    </main>
 
     <script src="script.js"></script>
 </body>
