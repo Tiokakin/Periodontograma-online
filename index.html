@@ -3,84 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal Clínico | Francisco Méndez</title>
+    <title>Dental Suite | Francisco Méndez</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .glass {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        body {
+            background: radial-gradient(circle at top right, #e0f2fe, #f8fafc);
+        }
+    </style>
 </head>
-<body class="bg-gray-50 min-h-screen font-sans">
+<body class="min-h-screen font-sans text-slate-800">
 
-    <header class="bg-blue-700 text-white shadow-md p-6">
+    <nav class="p-6">
         <div class="container mx-auto flex justify-between items-center">
-            <div>
-                <h1 class="text-2xl font-bold tracking-tight">Portal de Aplicaciones Clínicas</h1>
-                <p class="text-blue-100 text-sm">Especialidad en Implantología</p>
+            <div class="flex items-center gap-3">
+                <div class="bg-blue-600 p-2 rounded-lg shadow-lg shadow-blue-200">
+                    <i class="fa-solid fa-tooth text-white text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-black tracking-tight text-slate-900">DENTAL<span class="text-blue-600">SUITE</span></h1>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Innovation Lab</p>
+                </div>
             </div>
-            <i class="fa-solid fa-tooth text-3xl opacity-50"></i>
+            <div class="hidden md:flex gap-6 text-sm font-semibold text-slate-500">
+                <span class="text-blue-600 border-b-2 border-blue-600">Dashboard</span>
+                <span class="hover:text-slate-800 cursor-pointer transition">Pacientes</span>
+                <span class="hover:text-slate-800 cursor-pointer transition">Configuración</span>
+            </div>
         </div>
-    </header>
+    </nav>
 
-    <main class="container mx-auto px-4 py-12">
-        <h2 class="text-gray-700 text-lg font-semibold mb-8 border-b pb-2">Mis Herramientas Digitales</h2>
+    <main class="container mx-auto px-6 py-12">
+        <header class="mb-12">
+            <h2 class="text-4xl font-extrabold text-slate-900 mb-2">Bienvenido, Dr. Méndez</h2>
+            <p class="text-slate-500 max-w-md italic">Seleccione una herramienta para comenzar el diagnóstico asistido por voz.</p>
+        </header>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col">
-                <div class="h-32 bg-blue-50 flex items-center justify-center rounded-t-2xl">
-                    <i class="fa-solid fa-microphone-lines text-blue-500 text-5xl"></i>
-                </div>
-                <div class="p-6 flex-grow">
-                    <h3 class="text-xl font-bold text-gray-800">PeriodontoVoice Pro</h3>
-                    <p class="text-gray-500 text-sm mt-3 leading-relaxed">
-                        Reconocimiento de voz para el llenado automático de periodontogramas. Optimiza el tiempo en clínica sin asistente.
+            <div class="glass rounded-3xl p-1 shadow-xl shadow-blue-900/5 hover:shadow-blue-900/10 transition-all duration-500 group">
+                <div class="bg-white rounded-[22px] p-8 h-full flex flex-col">
+                    <div class="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
+                        <i class="fa-solid fa-microphone-lines text-blue-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-slate-800 mb-3">PeriodontoVoice</h3>
+                    <p class="text-slate-500 text-sm leading-relaxed mb-8 flex-grow">
+                        Sistema especializado en el registro de sacos, recesiones y nivel de inserción mediante comandos de voz.
                     </p>
+                    <a href="./Appsdental/index.html" class="flex items-center justify-between bg-slate-900 hover:bg-blue-600 text-white px-6 py-4 rounded-2xl font-bold transition-all">
+                        Lanzar App
+                        <i class="fa-solid fa-arrow-right text-sm"></i>
+                    </a>
                 </div>
-               <div class="p-6 border-t border-gray-50">
-    <a href="./Appsdental/index.html" class="block text-center w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition">
-        Iniciar Aplicación
-    </a>
-</div>
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col">
-    <div class="h-32 bg-indigo-50 flex items-center justify-center rounded-t-2xl">
-        <i class="fa-solid fa-tooth text-indigo-500 text-5xl"></i>
-    </div>
-    <div class="p-6 flex-grow">
-        <h3 class="text-xl font-bold text-gray-800">OdontoVoice Pro</h3>
-        <p class="text-gray-500 text-sm mt-3 leading-relaxed">
-            Mapeo de patologías y restauraciones mediante comandos de voz. Generación de esquema dental gráfico automatizado.
-        </p>
-    </div>
-    <div class="p-6 border-t border-gray-50">
-        <a href="./odontograma/index.html" class="block text-center w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl transition shadow-lg shadow-indigo-100">
-            Abrir Odontograma
-        </a>
-    </div>
-</div>
             </div>
 
-            <div class="bg-gray-100 rounded-2xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center p-8 text-center opacity-60">
-                <div class="bg-gray-200 w-16 h-16 rounded-full flex items-center justify-center mb-4">
-                    <i class="fa-solid fa-plus text-gray-400 text-2xl"></i>
+            <div class="glass rounded-3xl p-1 shadow-xl shadow-indigo-900/5 hover:shadow-indigo-900/10 transition-all duration-500 group">
+                <div class="bg-white rounded-[22px] p-8 h-full flex flex-col border border-transparent hover:border-indigo-100">
+                    <div class="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
+                        <i class="fa-solid fa- Pelvis text-indigo-600 text-2xl"></i>
+                        <i class="fa-solid fa-tooth text-indigo-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-slate-800 mb-3">OdontoVoice</h3>
+                    <p class="text-slate-500 text-sm leading-relaxed mb-8 flex-grow">
+                        Mapeo general de la cavidad oral, identificación de caries y restauraciones con dictado automático.
+                    </p>
+                    <a href="./odontograma/index.html" class="flex items-center justify-between bg-slate-900 hover:bg-indigo-600 text-white px-6 py-4 rounded-2xl font-bold transition-all">
+                        Lanzar App
+                        <i class="fa-solid fa-arrow-right text-sm"></i>
+                    </a>
                 </div>
-                <span class="text-gray-500 font-medium italic">Nueva herramienta en desarrollo...</span>
+            </div>
+
+            <div class="border-2 border-dashed border-slate-200 rounded-3xl p-8 flex flex-col items-center justify-center text-center opacity-50 hover:opacity-100 transition-opacity">
+                <div class="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mb-4">
+                    <i class="fa-solid fa-robot text-slate-400"></i>
+                </div>
+                <h4 class="font-bold text-slate-400 uppercase text-xs tracking-widest">IA Implantología</h4>
+                <p class="text-slate-400 text-[11px] mt-2 italic text-balance">Próximamente: Análisis de estabilidad primaria</p>
             </div>
 
         </div>
     </main>
 
-   <footer class="mt-auto py-10 text-center">
-    <div class="flex flex-col items-center justify-center gap-2">
-        <p class="text-gray-400 text-xs tracking-widest uppercase">
-            © 2026 Plataforma de Odontología Digital
-        </p>
-        <div class="flex items-center gap-2">
-            <span class="px-2 py-1 bg-gray-200 text-gray-600 text-[10px] font-bold rounded-md tracking-tighter">
-                VERSION 0.0001
-            </span>
-            <span class="h-1 w-1 bg-green-400 rounded-full animate-pulse"></span>
-            <span class="text-gray-400 text-[10px]">Sistema en Línea</span>
+    <footer class="mt-20 border-t border-slate-200 py-10">
+        <div class="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+                <span class="text-xs font-bold text-slate-500 tracking-tighter uppercase">Versión 0.0001 Alpha</span>
+            </div>
+            <p class="text-slate-400 text-[10px] font-medium uppercase tracking-widest">© 2026 Dr. Francisco Méndez | Implantología Dental</p>
         </div>
-    </div>
-</footer>
+    </footer>
 
 </body>
 </html>
