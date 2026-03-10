@@ -1,16 +1,33 @@
-#odontograma-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
+body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; color: #333; margin: 0; padding: 20px; }
+header { text-align: center; margin-bottom: 30px; }
+
+#odontograma-grid { 
+    display: grid; 
+    grid-template-columns: repeat(16, 1fr); 
+    gap: 10px; 
+    margin: 20px auto; 
+    max-width: 1000px;
+    background: white;
     padding: 20px;
+    border-radius: 12px;
 }
 
-.diente-box {
-    border: 1px solid #ccc;
-    padding: 10px;
-    text-align: center;
-    width: 60px;
-}
+.diente { border: 2px solid #ddd; padding: 10px; text-align: center; border-radius: 8px; transition: 0.3s; }
+.diente span { font-weight: bold; font-size: 0.8em; }
+.corona { width: 30px; height: 30px; margin: 5px auto; border-radius: 4px; border: 1px solid #ccc; }
 
-.estado-caries { background-color: #ffcccc; color: red; }
-.estado-ausente { background-color: #333; color: white; }
+/* Estados Visuales */
+.estado-caries .corona { background: #ff4d4d; border-color: #b30000; }
+.estado-ausente { opacity: 0.3; background: #eee; }
+.estado-obturado .corona { background: #4dabff; border-color: #0066cc; }
+
+.panel-control { text-align: center; background: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; }
+.btn-primario { background: #007bff; color: white; border: none; padding: 12px 25px; border-radius: 25px; cursor: pointer; font-size: 16px; }
+.btn-secundario { background: #28a745; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; }
+
+#indicador { width: 12px; height: 12px; display: inline-block; border-radius: 50%; background: #ccc; margin-right: 5px; }
+.recording { background: red !important; animation: pulse 1s infinite; }
+
+@keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
+@media (max-width: 800px) { #odontograma-grid { grid-template-columns: repeat(8, 1fr); } }
