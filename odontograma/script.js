@@ -1,3 +1,11 @@
+// Al cargar la app de Odontograma
+window.addEventListener('load', () => {
+    const datos = JSON.parse(localStorage.getItem('SesionClinica'));
+    if (datos) {
+        // Puedes crear un banner superior que diga el nombre del paciente
+        console.log("Odontograma listo para: " + datos.paciente);
+    }
+});
 const odontogramaGrid = document.getElementById('odontograma-grid');
 const btnVoz = document.getElementById('btn-voz');
 const feedback = document.getElementById('feedback');
