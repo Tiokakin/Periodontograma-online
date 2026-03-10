@@ -99,3 +99,19 @@ function generarReporteConsolidado() {
     `);
     ventanaReporte.document.close();
 }
+// Función para verificar si hay datos frescos de la ficha clínica
+window.addEventListener('DOMContentLoaded', () => {
+    // Intentamos leer si la app "Ficha Clínica" guardó datos nuevos
+    const fichaReciente = JSON.parse(localStorage.getItem('SesionClinica'));
+    
+    if (fichaReciente) {
+        // Rellenamos los campos del portal automáticamente si están vacíos
+        const inputOperador = document.getElementById('operador');
+        const inputPaciente = document.getElementById('paciente-id');
+        const inputEdad = document.getElementById('paciente-edad');
+
+        if (inputPaciente && !inputPaciente.value) inputPaciente.value = fichaReciente.paciente || '';
+        if (inputEdad && !inputEdad.value) inputEdad.value = fichaReciente.edad || '';
+        if (inputOperador && !inputOperador.value) inputOperador.value = fichaReciente.operador || '';
+    }
+});
