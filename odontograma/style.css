@@ -1,33 +1,123 @@
-body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; color: #333; margin: 0; padding: 20px; }
-header { text-align: center; margin-bottom: 30px; }
-
-#odontograma-grid { 
-    display: grid; 
-    grid-template-columns: repeat(16, 1fr); 
-    gap: 10px; 
-    margin: 20px auto; 
-    max-width: 1000px;
-    background: white;
-    padding: 20px;
-    border-radius: 12px;
+/* ================================================================
+[PUNTO DE REFERENCIA 1: VARIABLES Y RESET]
+Configuración base y colores principales de la Suite Dental
+================================================================
+*/
+:root {
+    --primary-indigo: #4f46e5;
+    --medical-blue: #0ea5e9;
+    --caries-red: #ef4444;
+    --absent-black: #1e293b;
+    --obturated-blue: #60a5fa;
+    --bg-slate: #f8fafc;
+    --border-soft: #e2e8f0;
 }
 
-.diente { border: 2px solid #ddd; padding: 10px; text-align: center; border-radius: 8px; transition: 0.3s; }
-.diente span { font-weight: bold; font-size: 0.8em; }
-.corona { width: 30px; height: 30px; margin: 5px auto; border-radius: 4px; border: 1px solid #ccc; }
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
 
-/* Estados Visuales */
-.estado-caries .corona { background: #ff4d4d; border-color: #b30000; }
-.estado-ausente { opacity: 0.3; background: #eee; }
-.estado-obturado .corona { background: #4dabff; border-color: #0066cc; }
+body {
+    background-color: var(--bg-slate);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+}
 
-.panel-control { text-align: center; background: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; }
-.btn-primario { background: #007bff; color: white; border: none; padding: 12px 25px; border-radius: 25px; cursor: pointer; font-size: 16px; }
-.btn-secundario { background: #28a745; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; }
+/* ================================================================
+[PUNTO DE REFERENCIA 2: ESTRUCTURA DEL ODONTOGRAMA]
+Estilos para el grid y las piezas dentales
+================================================================
+*/
+#odontograma-grid {
+    user-select: none;
+    perspective: 1000px;
+}
 
-#indicador { width: 12px; height: 12px; display: inline-block; border-radius: 50%; background: #ccc; margin-right: 5px; }
-.recording { background: red !important; animation: pulse 1s infinite; }
+.diente-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
 
-@keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+.diente-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
 
-@media (max-width: 800px) { #odontograma-grid { grid-template-columns: repeat(8, 1fr); } }
+/* ================================================================
+[PUNTO DE REFERENCIA 3: ESTADOS CLÍNICOS]
+Colores que se activan según el hallazgo (Voz o Manual)
+================================================================
+*/
+.corona-visual {
+    transition: background-color 0.4s ease, border 0.3s ease;
+}
+
+/* Clases inyectadas por script.js */
+.bg-red-500 {
+    background-color: var(--caries-red) !important;
+    border: 1px solid #b91c1c !important;
+}
+
+.bg-slate-800 {
+    background-color: var(--absent-black) !important;
+    opacity: 0.8;
+}
+
+.bg-blue-400 {
+    background-color: var(--obturated-blue) !important;
+    border: 1px solid #2563eb !important;
+}
+
+/* ================================================================
+[PUNTO DE REFERENCIA 4: ANIMACIONES DE VOZ]
+Feedback visual para cuando el micrófono está activo
+================================================================
+*/
+#btn-voz:active {
+    transform: scale(0.98);
+}
+
+#indicador-mic.recording {
+    background-color: #ef4444;
+    animation: pulse-red 1.5s infinite;
+}
+
+@keyframes pulse-red {
+    0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
+/* ================================================================
+[PUNTO DE REFERENCIA 5: COMPONENTES DE INTERFAZ]
+Historial, scrollbars y detalles menores
+================================================================
+*/
+#lista-historial::-webkit-scrollbar {
+    width: 6px;
+}
+
+#lista-historial::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+#lista-historial::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
+#lista-historial::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+.text-shadow-sm {
+    text-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+/* Ajustes para pantallas pequeñas */
+@media (max-width: 768px) {
+    #odontograma-grid {
+        grid-template-columns: repeat(4, 1fr) !important;
+    }
+}
