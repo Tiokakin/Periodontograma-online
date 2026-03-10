@@ -1,1 +1,27 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Odontograma Voice Pro - Registro Clínico</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Odontograma Digital con Voz</h1>
+    <div id="controles">
+        <button id="btn-dictar">🎤 Iniciar Dictado</button>
+        <p id="status">Estado: En espera...</p>
+        <p id="transcripcion">Dijo: "..."</p>
+    </div>
 
+    <div id="odontograma-container">
+        </div>
+
+    <div id="historial-versiones">
+        <h3>Versiones del Odontograma</h3>
+        <ul id="lista-versiones"></ul>
+        <button id="btn-guardar">💾 Guardar Versión Actual</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
