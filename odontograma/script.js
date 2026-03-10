@@ -1,125 +1,151 @@
-// --- CONFIGURACIÓN DE LA SUITE DENTAL ---
-const APP_NAME = "OdontoVoice_Pro";
-const piezas = [
-    18, 17, 16, 15, 14, 13, 12, 11, 21, 22, 23, 24, 25, 26, 27, 28,
-    48, 47, 46, 45, 44, 43, 42, 41, 31, 32, 33, 34, 35, 36, 37, 38
+/**
+ * [PUNTO DE REFERENCIA 1: CONFIGURACIÓN GLOBAL]
+ * Definición de constantes y estados iniciales
+ */
+const APP_NAME = "Odontograma_Digital";
+const piezasDentales = [
+    18, 17, 16, 15, 14, 13, 12, 11, 21, 22, 23, 24, 25, 26, 27, 28, // Superiores
+    48, 47, 46, 45, 44, 43, 42, 41, 31, 32, 33, 34, 35, 36, 37, 38  // Inferiores
 ];
 
-// --- ELEMENTOS DEL DOM ---
-const odontogramaGrid = document.getElementById('odontograma-grid');
-const feedback = document.getElementById('feedback');
-const btnVoz = document.getElementById('btn-voz');
-const listaHistorial = document.getElementById('lista-historial');
-
-// --- 1. INICIALIZACIÓN Y LECTURA DE SESIÓN ---
+/**
+ * [PUNTO DE REFERENCIA 2: CARGA DE SESIÓN CLÍNICA]
+ * Al iniciar, leemos los datos del paciente desde el portal principal
+ */
 document.addEventListener('DOMContentLoaded', () => {
     const sesion = JSON.parse(localStorage.getItem('SesionClinica'));
     
     if (sesion) {
         document.getElementById('nombre-paciente').innerText = sesion.paciente;
         document.getElementById('id-sesion').innerText = `Sesión: #${sesion.id_sesion}`;
-        document.getElementById('user-pill').classList.remove('hidden');
     } else {
-        alert("Atención: No hay una sesión activa de paciente. Los datos no se guardarán correctamente.");
+        document.getElementById('nombre-paciente').innerText = "Sin Paciente Seleccionado";
+        console.warn("No se detectó una SesionClinica activa.");
     }
-    
-    initOdontograma();
-    cargarHistorialPrevio();
+
+    generarInterfazOdontograma();
 });
 
-// --- 2. GENERACIÓN DE INTERFAZ ---
-function initOdontograma() {
-    odontogramaGrid.innerHTML = '';
-    piezas.forEach(num => {
+/**
+ * [PUNTO DE REFERENCIA 3: GENERACIÓN DINÁMICA DE DIENTES]
+ * Crea los elementos visuales en el grid de la aplicación
+ */
+function generarInterfazOdontograma() {
+    const grid = document.getElementById('odontograma-grid');
+    grid.innerHTML = '';
+
+    piezasDentales.forEach(num => {
         const div = document.createElement('div');
-        div.className = `diente-card p-2 border border-slate-200 rounded-lg text-center bg-white hover:border-indigo-300 transition-colors cursor-pointer group`;
-        div.id = `diente-${num}`;
+        div.className = "group border border-slate-200 p-2 rounded-lg bg-white text-center hover:border-indigo-400 transition-all cursor-pointer";
+        div.id = `pieza-${num}`;
         div.innerHTML = `
-            <span class="text-[10px] font-bold text-slate-400 group-hover:text-indigo-500">${num}</span>
-            <div class="w-full h-8 bg-slate-100 rounded mt-1 corona-visual"></div>
+            <span class="text-[10px] font-bold text-slate-400 group-hover:text-indigo-600">${num}</span>
+            <div class="corona-visual w-full h-8 bg-slate-100 rounded-sm mt-1 transition-colors border border-transparent"></div>
         `;
-        odontogramaGrid.appendChild(div);
+        grid.appendChild(div);
     });
 }
 
-// --- 3. RECONOCIMIENTO DE VOZ ---
+/**
+ * [PUNTO DE REFERENCIA 4: LÓGICA DE RECONOCIMIENTO DE VOZ]
+ * Escucha comandos y los traduce a hallazgos clínicos
+ */
 const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
 recognition.lang = 'es-CL';
 recognition.continuous = false;
 
-btnVoz.onclick = () => {
+document.getElementById('btn-voz').onclick = () => {
     recognition.start();
-    btnVoz.classList.add('ring-4', 'ring-indigo-100');
-    feedback.innerText = "Escuchando...";
+    document.getElementById('feedback').innerText = "Escuchando pieza y hallazgo...";
 };
 
 recognition.onresult = (event) => {
-    const texto = event.results[0][0].transcript.toLowerCase();
-    feedback.innerText = `Interpretado: "${texto}"`;
-    procesarHallazgo(texto);
-    btnVoz.classList.remove('ring-4', 'ring-indigo-100');
+    const comando = event.results[0][0].transcript.toLowerCase();
+    document.getElementById('feedback').innerText = `Dijiste: "${comando}"`;
+    
+    interpretarComandoVoz(comando);
 };
 
-// --- 4. PERSISTENCIA EN HISTORIAL CLÍNICO ---
-function procesarHallazgo(comando) {
-    const numDiente = comando.match(/\d+/);
-    let detalle = "";
-    let colorClass = "";
-
-    if (comando.includes("caries")) { detalle = "Caries dental"; colorClass = "bg-red-500"; }
-    else if (comando.includes("ausente")) { detalle = "Pieza ausente"; colorClass = "bg-slate-800"; }
-    else if (comando.includes("resina") || comando.includes("obturado")) { detalle = "Restauración resina"; colorClass = "bg-blue-400"; }
-
-    if (numDiente && detalle) {
-        const n = numDiente[0];
-        actualizarUI(n, colorClass);
-        guardarEnHistorialCentral(n, detalle);
-    }
-}
-
-function actualizarUI(id, color) {
-    const corona = document.querySelector(`#diente-${id} .corona-visual`);
-    if (corona) {
-        corona.className = `w-full h-8 rounded mt-1 corona-visual ${color}`;
-    }
-}
-
-function guardarEnHistorialCentral(diente, detalle) {
-    const sesion = JSON.parse(localStorage.getItem('SesionClinica')) || { paciente: "Anónimo" };
+function interpretarComandoVoz(texto) {
+    // Buscamos el número de pieza dental en el texto
+    const coincidenciaPieza = texto.match(/\d+/);
     
-    // Crear el objeto según tu especificación
-    const nuevoRegistro = {
-        paciente: sesion.paciente,
-        diente: diente,
-        detalle: detalle,
-        fecha: new Date().toLocaleString(),
-        tipo_app: APP_NAME
-    };
+    if (coincidenciaPieza) {
+        const nDiente = parseInt(coincidenciaPieza[0]);
+        let hallazgo = "";
+        let colorClase = "";
 
-    // Obtener array actual, añadir y guardar
-    let historial = JSON.parse(localStorage.getItem('HistorialClinico')) || [];
-    historial.unshift(nuevoRegistro);
-    localStorage.setItem('HistorialClinico', JSON.stringify(historial));
+        // Diccionario de hallazgos
+        if (texto.includes("caries")) { 
+            hallazgo = "Caries dental"; 
+            colorClase = "bg-red-500"; 
+        } else if (texto.includes("ausente") || texto.includes("faltante")) { 
+            hallazgo = "Pieza ausente"; 
+            colorClase = "bg-slate-800"; 
+        } else if (texto.includes("resina") || texto.includes("obturado")) { 
+            hallazgo = "Restauración resina"; 
+            colorClase = "bg-blue-400"; 
+        } else if (texto.includes("sano") || texto.includes("limpio")) {
+            hallazgo = "Sano";
+            colorClase = "bg-slate-100";
+        }
 
-    renderizarFila(nuevoRegistro);
+        if (hallazgo && piezasDentales.includes(nDiente)) {
+            actualizarDienteVisual(nDiente, colorClase);
+            registrarEnHistorial(nDiente, hallazgo);
+        }
+    }
 }
 
-function renderizarFila(reg) {
-    const li = document.createElement('li');
-    li.className = "px-6 py-3 flex justify-between items-center bg-white hover:bg-slate-50 transition-colors";
-    li.innerHTML = `
-        <div>
-            <p class="text-sm font-bold text-slate-700">Pieza ${reg.diente}: <span class="text-indigo-600 font-normal">${reg.detalle}</span></p>
-            <p class="text-[10px] text-slate-400">${reg.fecha}</p>
-        </div>
-        <span class="text-[9px] bg-slate-100 px-2 py-1 rounded text-slate-500 font-mono">${reg.tipo_app}</span>
+/**
+ * [PUNTO DE REFERENCIA 5: ACTUALIZACIÓN VISUAL]
+ * Cambia el color del diente en pantalla
+ */
+function actualizarDienteVisual(numero, claseColor) {
+    const corona = document.querySelector(`#pieza-${numero} .corona-visual`);
+    if (corona) {
+        // Limpiamos colores anteriores
+        corona.className = `corona-visual w-full h-8 rounded-sm mt-1 transition-colors border border-transparent ${claseColor}`;
+    }
+}
+
+/**
+ * [PUNTO DE REFERENCIA 6: INTEGRACIÓN CON REPORTE GLOBAL]
+ * Guarda silenciosamente en localStorage para que el Portal Principal lo lea
+ */
+function registrarEnHistorial(diente, hallazgo) {
+    try {
+        // 1. Leer historial existente
+        let historialGlobal = JSON.parse(localStorage.getItem('HistorialClinico')) || [];
+
+        // 2. Crear objeto de hallazgo con la estructura requerida
+        const nuevoHallazgo = {
+            tipo_app: APP_NAME,
+            diente: diente,
+            detalle: hallazgo,
+            fecha: new Date().toLocaleString()
+        };
+
+        // 3. Guardar en el array global
+        historialGlobal.push(nuevoHallazgo);
+        localStorage.setItem('HistorialClinico', JSON.stringify(historialGlobal));
+
+        // 4. Actualizar lista visual en la app (Punto de referencia 5 del HTML)
+        actualizarListaHistorialLocal(nuevoHallazgo);
+
+        console.log(`[Suite Dental] Sincronizado: Pieza ${diente} - ${hallazgo}`);
+    } catch (error) {
+        console.error("Error al sincronizar con el Historial Clínico:", error);
+    }
+}
+
+function actualizarListaHistorialLocal(hallazgo) {
+    const lista = document.getElementById('lista-historial');
+    const item = document.createElement('li');
+    item.className = "px-6 py-2 text-[11px] flex justify-between bg-white border-b border-slate-50";
+    item.innerHTML = `
+        <span><strong>Piza ${hallazgo.diente}:</strong> ${hallazgo.detalle}</span>
+        <span class="text-slate-400 font-mono italic">${hallazgo.fecha.split(',')[1]}</span>
     `;
-    listaHistorial.prepend(li);
-    document.getElementById('count-registros').innerText = `${listaHistorial.children.length} registros`;
-}
-
-function cargarHistorialPrevio() {
-    const historial = JSON.parse(localStorage.getItem('HistorialClinico')) || [];
-    // Filtrar solo los de esta app para la lista visual si se desea, o mostrar todos
-    historial.reverse().forEach(reg => renderizarFila(reg));
+    lista.prepend(item);
 }
