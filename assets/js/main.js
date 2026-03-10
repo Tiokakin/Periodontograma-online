@@ -1,26 +1,23 @@
-/**
- * Gestión de Sesión Clínica
- * Guarda los datos del operador y paciente en LocalStorage
- */
+// assets/js/main.js
 
 function prepararSesion() {
-    const datos = {
-        operador: document.getElementById('operador').value,
-        paciente: document.getElementById('paciente-id').value,
-        edad: document.getElementById('paciente-edad').value,
-        timestamp: new Date().toLocaleString()
+    const operador = document.getElementById('operador').value;
+    const paciente = document.getElementById('paciente-id').value;
+    const edad = document.getElementById('paciente-edad').value;
+
+    if (!paciente) {
+        alert("Por favor, ingrese al menos el nombre del paciente.");
+        return;
+    }
+
+    const sesion = {
+        operador: operador,
+        paciente: paciente,
+        edad: edad,
+        fecha: new Date().toLocaleDateString(),
+        id_sesion: Date.now()
     };
 
-    localStorage.setItem('sesionClinica', JSON.stringify(datos));
-    console.log("Datos de sesión actualizados:", datos.paciente);
+    // Guardamos la sesión activa
+    localStorage.setItem('SesionClinica', JSON.stringify(sesion));
 }
-
-// Carga automática al iniciar el portal
-window.addEventListener('DOMContentLoaded', () => {
-    const guardados = JSON.parse(localStorage.getItem('sesionClinica'));
-    if (guardados) {
-        if(document.getElementById('operador')) document.getElementById('operador').value = guardados.operador || '';
-        if(document.getElementById('paciente-id')) document.getElementById('paciente-id').value = guardados.paciente || '';
-        if(document.getElementById('paciente-edad')) document.getElementById('paciente-edad').value = guardados.edad || '';
-    }
-});
