@@ -3,32 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Odontograma Voice Pro | Francisco Méndez</title>
+    <title>OdontoVoice Pro | Suite Dental</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
-    <header>
-        <h1>Odontograma Digital Inteligente</h1>
-        <p>Especialidad en Implantología</p>
+<body class="bg-slate-50 min-h-screen font-sans text-slate-900">
+
+    <header class="bg-white border-b border-slate-200 px-6 py-4 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center text-white shadow-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold text-slate-800 tracking-tight">OdontoVoice Pro</h1>
+                    <p class="text-xs text-indigo-600 font-semibold uppercase tracking-wider">Módulo de Odontograma</p>
+                </div>
+            </div>
+            <div id="user-pill" class="hidden md:flex items-center gap-3 bg-slate-100 px-4 py-2 rounded-full border border-slate-200">
+                <div class="text-right">
+                    <p id="nombre-paciente" class="text-sm font-bold text-slate-700 leading-none">Cargando...</p>
+                    <p id="id-sesion" class="text-[10px] text-slate-500 mt-1 uppercase">Sesión: #000</p>
+                </div>
+                <div class="h-8 w-8 bg-white rounded-full flex items-center justify-center shadow-sm">
+                    <span class="text-indigo-600 text-xs font-bold">PT</span>
+                </div>
+            </div>
+        </div>
     </header>
 
-    <main>
-        <div class="panel-control">
-            <button id="btn-voz" class="btn-primario">🎤 Iniciar Dictado</button>
-            <div id="status-box">
-                <span id="indicador"></span>
-                <p id="feedback">Listo para registrar...</p>
+    <main class="max-w-7xl mx-auto p-6 grid grid-cols-1 lg:grid-cols-4 gap-6">
+        
+        <div class="lg:col-span-1 space-y-6">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <h2 class="text-sm font-bold text-slate-400 uppercase mb-4">Captura de Voz</h2>
+                <button id="btn-voz" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-6 rounded-xl transition-all shadow-indigo-200 shadow-lg flex items-center justify-center gap-3 active:scale-95">
+                    <span id="mic-icon" class="relative flex h-3 w-3">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75 hidden"></span>
+                        <span class="relative inline-flex rounded-full h-3 w-3 bg-white"></span>
+                    </span>
+                    Iniciar Dictado
+                </button>
+                <div class="mt-4 p-3 bg-slate-50 rounded-lg border border-dashed border-slate-300">
+                    <p id="feedback" class="text-sm text-slate-500 italic text-center">Esperando comando...</p>
+                </div>
+            </div>
+
+            <div class="bg-indigo-900 p-6 rounded-2xl text-white shadow-xl">
+                <h3 class="font-bold mb-2">Comandos Rápidos</h3>
+                <ul class="text-xs space-y-2 opacity-80">
+                    <li>• "Pieza [Número] Caries"</li>
+                    <li>• "Pieza [Número] Ausente"</li>
+                    <li>• "Pieza [Número] Resina"</li>
+                </ul>
             </div>
         </div>
 
-        <div id="odontograma-grid">
+        <div class="lg:col-span-3">
+            <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
+                <div id="odontograma-grid" class="grid grid-cols-8 md:grid-cols-16 gap-3">
+                    </div>
             </div>
-
-        <section class="versiones-container">
-            <h3>Historial de Versiones (Sincronizado)</h3>
-            <button id="btn-guardar" class="btn-secundario">💾 Guardar Versión Actual</button>
-            <ul id="lista-versiones"></ul>
-        </section>
+            
+            <div class="mt-6 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="bg-slate-50 px-6 py-4 border-b border-slate-200 flex justify-between items-center">
+                    <h3 class="text-sm font-bold text-slate-600 uppercase">Registros de esta Sesión</h3>
+                    <span id="count-registros" class="bg-indigo-100 text-indigo-700 text-xs font-bold px-2 py-1 rounded-md">0 registros</span>
+                </div>
+                <ul id="lista-historial" class="divide-y divide-slate-100 max-h-60 overflow-y-auto">
+                    </ul>
+            </div>
+        </div>
     </main>
 
     <script src="script.js"></script>
