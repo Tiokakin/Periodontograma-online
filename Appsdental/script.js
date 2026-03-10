@@ -98,30 +98,64 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('linea-recesion').setAttribute('points', cR);
         document.getElementById('linea-sondaje').setAttribute('points', cP);
     }
+// --- ANCLA: INTEGRACION GLOBAL (Generador de Reportes) ---
+function registrarEnHistorial(diente, hallazgo) {
+    try {
+        // 1. Leer el historial existente o crear uno nuevo
+        let historialGlobal = JSON.parse(localStorage.getItem('HistorialClinico')) || [];
 
-    // --- ANCLA: GUARDADO CENTRALIZADO ---
-    btnGuardar.onclick = ejecutarGuardado;
+        // 2. Crear el objeto con la estructura solicitada
+        const nuevoHallazgo = {
+            tipo_app: 'Periodoncia_Pro', // Identificador único para el generador
+            diente: diente,
+            detalle: hallazgo,
+            fecha: new Date().toLocaleString()
+        };
 
-    function ejecutarGuardado() {
-        const diente = secuenciaDientes[indiceActual];
-        const detalle = `PS Vest[${document.getElementById('v-d-ps').value}-${document.getElementById('v-m-ps').value}-${document.getElementById('v-mes-ps').value}]`;
+        // 3. Empujar y guardar
+        historialGlobal.push(nuevoHallazgo);
+        localStorage.setItem('HistorialClinico', JSON.stringify(historialGlobal));
         
-        // GUARDAR EN HISTORIAL CENTRAL (localStorage)
-        actualizarHistorialCentral(diente, detalle);
-
-        // Actualizar UI Local
-        const badge = document.createElement('div');
-        badge.className = "bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold py-2 px-3 rounded-lg text-center animate-pulse";
-        badge.innerText = `Diente ${diente}`;
-        listaHistorial.prepend(badge);
-
-        // Siguiente diente
-        indiceActual++;
-        if (indiceActual < secuenciaDientes.length) {
-            dienteLabel.innerText = "Diente: " + secuenciaDientes[indiceActual];
-            limpiarCampos();
-        }
+        console.log(`✅ Hallazgo del diente ${diente} sincronizado con el Portal Global.`);
+    } catch (error) {
+        console.error("Error al sincronizar con el Historial Global:", error);
     }
+}
+    // --- ANCLA: GUARDADO (Actualizado para Integración Global) ---
+function ejecutarGuardado() {
+    const diente = secuenciaDientes[indiceActual];
+    
+    // Formateamos el "hallazgo" para que sea legible en el reporte global
+    // Ejemplo: "PS V[3-2-3] P[2-2-4] | SS: Distal"
+    const v_ps = [document.getElementById('v-d-ps').value, document.getElementById('v-m-ps').value, document.getElementById('v-mes-ps').value].join('-');
+    const p_ps = [document.getElementById('p-d-ps').value, document.getElementById('p-m-ps').value, document.getElementById('p-mes-ps').value].join('-');
+    
+    const resumenHallazgo = `PS Vest[${v_ps}] Palat[${p_ps}]`;
+
+    // 1. REGISTRO SILENCIOSO PARA EL PORTAL GLOBAL
+    registrarEnHistorial(diente, resumenHallazgo);
+
+    // 2. Lógica interna de la App (Memoria local para el PDF propio)
+    memoriaExamen.push({ diente, detalle: resumenHallazgo });
+    
+    // Actualización de la interfaz (Lista visual)
+    if (memoriaExamen.length === 1) listaHistorial.innerHTML = "";
+    const badge = document.createElement('div');
+    badge.className = "bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold py-2 px-3 rounded-lg text-center shadow-sm";
+    badge.innerText = `Diente ${diente} ✅`;
+    listaHistorial.prepend(badge);
+
+    // Salto al siguiente diente
+    indiceActual++;
+    if (indiceActual < secuenciaDientes.length) {
+        dienteLabel.innerText = "Diente: " + secuenciaDientes[indiceActual];
+        actualizarSiluetaDiente(secuenciaDientes[indiceActual]);
+        limpiarCampos();
+    } else {
+        status.innerText = "🏁 Examen Periodontal Finalizado";
+        alert("Has completado el registro de todos los dientes.");
+    }
+}
 
     function limpiarCampos() {
         document.querySelectorAll('input[type="number"]').forEach(i => i.value = 0);
@@ -131,3 +165,4 @@ document.addEventListener('DOMContentLoaded', () => {
     // Inicializar al cargar
     cargarSesion();
 });
+
