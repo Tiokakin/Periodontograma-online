@@ -1,66 +1,86 @@
-// Configuración de reconocimiento de voz
-const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-recognition.lang = 'es-CL'; // Español de Chile
-recognition.continuous = false;
-
-const btnDictar = document.getElementById('btn-dictar');
-const status = document.getElementById('status');
+const odontogramaGrid = document.getElementById('odontograma-grid');
+const btnVoz = document.getElementById('btn-voz');
+const feedback = document.getElementById('feedback');
 const listaVersiones = document.getElementById('lista-versiones');
 
-// Estructura de datos del Odontograma
-let odontogramaActual = {
-    fecha: new Date().toLocaleString(),
-    hallazgos: {} // Ejemplo: { "18": "caries", "21": "ausente" }
-};
+// Estado inicial del Odontograma
+let estadoDientes = {};
 
-btnDictar.onclick = () => {
+// 1. Generar Odontograma (32 piezas estándar)
+const piezas = [
+    18, 17, 16, 15, 14, 13, 12, 11, 21, 22, 23, 24, 25, 26, 27, 28,
+    48, 47, 46, 45, 44, 43, 42, 41, 31, 32, 33, 34, 35, 36, 37, 38
+];
+
+function initOdontograma() {
+    odontogramaGrid.innerHTML = '';
+    piezas.forEach(num => {
+        const div = document.createElement('div');
+        div.id = `diente-${num}`;
+        div.className = 'diente';
+        div.innerHTML = `<span>${num}</span><div class="corona"></div>`;
+        odontogramaGrid.appendChild(div);
+        estadoDientes[num] = "sano";
+    });
+}
+
+// 2. Reconocimiento de Voz
+const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+recognition.lang = 'es-CL';
+
+btnVoz.onclick = () => {
     recognition.start();
-    status.innerText = "Estado: Escuchando...";
+    feedback.innerText = "Escuchando pieza y hallazgo...";
+    document.getElementById('indicador').classList.add('recording');
 };
 
 recognition.onresult = (event) => {
-    const voz = event.results[0][0].transcript.toLowerCase();
-    document.getElementById('transcripcion').innerText = `Dijo: "${voz}"`;
-    procesarComando(voz);
+    const texto = event.results[0][0].transcript.toLowerCase();
+    feedback.innerText = `Registrado: "${texto}"`;
+    document.getElementById('indicador').classList.remove('recording');
+    procesarComando(texto);
 };
 
-function procesarComando(texto) {
-    // Ejemplo de comando: "pieza 18 caries"
-    const numeroDiente = texto.match(/\d+/); // Extrae el número
-    if (numeroDiente) {
-        const d = numeroDiente[0];
-        if (texto.includes("caries")) {
-            actualizarDiente(d, "caries");
-        } else if (texto.includes("ausente")) {
-            actualizarDiente(d, "ausente");
-        } else if (texto.includes("sano")) {
-            actualizarDiente(d, "sano");
+function procesarComando(comando) {
+    const num = comando.match(/\d+/);
+    if (num && piezas.includes(parseInt(num[0]))) {
+        const n = num[0];
+        let estado = "";
+        
+        if (comando.includes("caries")) estado = "caries";
+        if (comando.includes("ausente") || comando.includes("perdida")) estado = "ausente";
+        if (comando.includes("obturado") || comando.includes("resina")) estado = "obturado";
+        
+        if (estado) {
+            estadoDientes[n] = estado;
+            const el = document.getElementById(`diente-${n}`);
+            el.className = `diente estado-${estado}`;
         }
     }
-    status.innerText = "Estado: Procesado.";
 }
 
-function actualizarDiente(id, estado) {
-    odontogramaActual.hallazgos[id] = estado;
-    console.log(`Diente ${id} actualizado a ${estado}`);
-    // Aquí podrías cambiar el color del SVG del diente
-}
-
-// --- GESTIÓN DE VERSIONES ---
+// 3. Gestión de Versiones y Sincronización
 function guardarVersion() {
-    let historial = JSON.parse(localStorage.getItem('historial_odontogramas')) || [];
-    odontogramaActual.fecha = new Date().toLocaleString();
-    historial.push({...odontogramaActual});
-    localStorage.setItem('historial_odontogramas', JSON.stringify(historial));
-    renderizarVersiones();
+    const nuevaVersion = {
+        fecha: new Date().toLocaleString(),
+        datos: { ...estadoDientes }
+    };
+    
+    let historial = JSON.parse(localStorage.getItem('versiones_odontograma')) || [];
+    historial.unshift(nuevaVersion); // Agregar al inicio
+    localStorage.setItem('versiones_odontograma', JSON.stringify(historial));
+    renderVersiones();
 }
 
-function renderizarVersiones() {
-    const historial = JSON.parse(localStorage.getItem('historial_odontogramas')) || [];
-    listaVersiones.innerHTML = historial.map((v, index) => 
-        `<li>Versión ${index + 1}: ${v.fecha} - (${Object.keys(v.hallazgos).length} hallazgos)</li>`
+function renderVersiones() {
+    const historial = JSON.parse(localStorage.getItem('versiones_odontograma')) || [];
+    listaVersiones.innerHTML = historial.map((v, i) => 
+        `<li><strong>V${historial.length - i}:</strong> ${v.fecha}</li>`
     ).join('');
 }
 
 document.getElementById('btn-guardar').onclick = guardarVersion;
-window.onload = renderizarVersiones;
+
+// Iniciar app
+initOdontograma();
+renderVersiones();
