@@ -3,103 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PeriodontoVoice Pro v0.0116</title>
-    <link rel="stylesheet" href="style.css">
+    <title>PeriodontoVoice Pro | Suite Dental</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
-<body>
+<body class="bg-slate-50 text-slate-800 font-sans leading-normal">
 
-    <header>
-        <h1>PeriodontoVoice Pro 🦷</h1>
-        <div class="paciente-info">
-            <input type="text" id="nombre-paciente" placeholder="Nombre del Paciente...">
-            <p id="status">Estado: Listo</p>
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="bg-indigo-600 p-2 rounded-lg text-white">
+                    <i class="fas fa-tooth fa-lg"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold text-slate-900 leading-tight">PeriodontoVoice <span class="text-indigo-600">Pro</span></h1>
+                    <p class="text-xs text-slate-500 font-medium uppercase tracking-wider">Módulo de Periodoncia Avanzada</p>
+                </div>
+            </div>
+            <div id="banner-paciente" class="hidden md:flex items-center gap-4 bg-slate-100 px-4 py-2 rounded-full border border-slate-200">
+                <div class="text-right">
+                    <p id="nombre-paciente-display" class="text-sm font-bold text-slate-700">Cargando...</p>
+                    <p id="operador-display" class="text-[10px] text-indigo-600 font-bold uppercase">Dr. --</p>
+                </div>
+                <i class="fas fa-user-circle text-slate-400 text-2xl"></i>
+            </div>
         </div>
     </header>
 
-    <div class="controles-principales">
-        <button id="btn-voz" class="btn-verde">🎤 Iniciar Dictado</button>
-        <button id="btn-guardar" class="btn-azul">💾 Guardar Diente</button>
-        <button id="btn-pdf" class="btn-rojo">📄 Generar PDF</button>
-    </div>
+    <main class="max-w-5xl mx-auto p-4 md:p-6 space-y-6">
 
-    <main>
-        <div class="ficha-clinica">
-            <h2 id="diente-actual">Diente: 1.8</h2>
+        <section class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <button id="btn-voz" class="flex items-center justify-center gap-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-xl transition-all shadow-md active:scale-95">
+                <i class="fas fa-microphone"></i> Iniciar Dictado
+            </button>
+            <button id="btn-guardar" class="flex items-center justify-center gap-3 bg-white border-2 border-slate-200 hover:border-indigo-600 text-slate-600 hover:text-indigo-600 font-bold py-4 rounded-xl transition-all shadow-sm">
+                <i class="fas fa-save"></i> Guardar Diente
+            </button>
+            <button id="btn-pdf" class="flex items-center justify-center gap-3 bg-slate-800 hover:bg-slate-900 text-white font-bold py-4 rounded-xl transition-all shadow-md">
+                <i class="fas fa-file-pdf"></i> Generar Reporte
+            </button>
+        </section>
 
-            <div class="grafico-container">
-                <svg id="periodontograma-svg" viewBox="0 0 300 200">
-                    <g id="silueta-diente" fill="#f9f9f9" stroke="#ddd" stroke-width="1">
-                        <path id="forma-diente" d="M80,50 Q80,20 150,20 Q220,20 220,50 L220,80 Q220,150 180,180 L150,150 L120,180 Q80,150 80,80 Z" />
-                    </g>
-                    <line x1="10" y1="85" x2="290" y2="85" stroke="#bbb" stroke-width="1" stroke-dasharray="2" />
-                    <polyline id="linea-recesion" fill="none" stroke="blue" stroke-width="3" points="50,85 150,85 250,85" />
-                    <polyline id="linea-sondaje" fill="none" stroke="red" stroke-width="3" points="50,85 150,85 250,85" />
-                </svg>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 id="diente-actual" class="text-2xl font-black text-slate-900">Diente: 1.8</h2>
+                    <span id="status" class="text-[10px] px-2 py-1 bg-amber-100 text-amber-700 rounded font-bold uppercase tracking-tighter italic">Esperando audio...</span>
+                </div>
+                <div class="bg-slate-50 rounded-xl p-4 border border-dashed border-slate-200">
+                    <svg id="periodontograma-svg" viewBox="0 0 300 200" class="w-full h-auto">
+                        <g id="silueta-diente" fill="#fff" stroke="#cbd5e1" stroke-width="1.5">
+                            <path id="forma-diente" d="M80,50 Q80,20 150,20 Q220,20 220,50 L220,80 Q220,150 180,180 L150,150 L120,180 Q80,150 80,80 Z" />
+                        </g>
+                        <line x1="10" y1="85" x2="290" y2="85" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4" />
+                        <polyline id="linea-recesion" fill="none" stroke="#2563eb" stroke-width="4" points="50,85 150,85 250,85" stroke-linecap="round" stroke-linejoin="round" />
+                        <polyline id="linea-sondaje" fill="none" stroke="#dc2626" stroke-width="4" points="50,85 150,85 250,85" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </div>
             </div>
 
-            <div class="tabla-scroll">
-                <table>
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                <table class="w-full text-sm">
                     <thead>
-                        <tr><th>Cara</th><th>Pto</th><th>NIC</th><th>PS</th><th>REC</th><th>SS</th></tr>
+                        <tr class="text-slate-400 border-b border-slate-100 italic">
+                            <th class="pb-3 font-medium text-left">Cara</th>
+                            <th class="pb-3 font-medium">NIC</th>
+                            <th class="pb-3 font-medium">PS</th>
+                            <th class="pb-3 font-medium">REC</th>
+                            <th class="pb-3 font-medium text-center">SS</th>
+                        </tr>
                     </thead>
-                    <tbody id="cuerpo-tabla">
-                        <tr class="v-row">
-                            <td rowspan="3">V</td><td>D</td>
-                            <td><input type="number" id="v-d-nic" value="0"></td>
-                            <td><input type="number" id="v-d-ps" value="0"></td>
-                            <td id="v-d-rec" class="rec-val">0</td>
-                            <td><input type="checkbox" id="v-d-ss"></td>
-                        </tr>
-                        <tr class="v-row"><td>M</td>
-                            <td><input type="number" id="v-m-nic" value="0"></td>
-                            <td><input type="number" id="v-m-ps" value="0"></td>
-                            <td id="v-m-rec" class="rec-val">0</td>
-                            <td><input type="checkbox" id="v-m-ss"></td>
-                        </tr>
-                        <tr class="v-row"><td>Mes</td>
-                            <td><input type="number" id="v-mes-nic" value="0"></td>
-                            <td><input type="number" id="v-mes-ps" value="0"></td>
-                            <td id="v-mes-rec" class="rec-val">0</td>
-                            <td><input type="checkbox" id="v-mes-ss"></td>
-                        </tr>
-                        <tr class="p-row-divider">
-                            <td rowspan="3">P/L</td><td>D</td>
-                            <td><input type="number" id="p-d-nic" value="0"></td>
-                            <td><input type="number" id="p-d-ps" value="0"></td>
-                            <td id="p-d-rec" class="rec-val">0</td>
-                            <td><input type="checkbox" id="p-d-ss"></td>
-                        </tr>
-                        <tr class="p-row"><td>M</td>
-                            <td><input type="number" id="p-m-nic" value="0"></td>
-                            <td><input type="number" id="p-m-ps" value="0"></td>
-                            <td id="p-m-rec" class="rec-val">0</td>
-                            <td><input type="checkbox" id="p-m-ss"></td>
-                        </tr>
-                        <tr class="p-row"><td>Mes</td>
-                            <td><input type="number" id="p-mes-nic" value="0"></td>
-                            <td><input type="number" id="p-mes-ps" value="0"></td>
-                            <td id="p-mes-rec" class="rec-val">0</td>
-                            <td><input type="checkbox" id="p-mes-ss"></td>
-                        </tr>
+                    <tbody class="divide-y divide-slate-50">
+                        <tr class="group"><td class="py-3 font-bold text-slate-400">V.Dist</td><td><input type="number" id="v-d-nic" value="0" class="w-12 p-1 text-center bg-slate-50 rounded border-none font-bold"></td><td><input type="number" id="v-d-ps" value="0" class="w-12 p-1 text-center bg-slate-50 rounded border-none font-bold"></td><td id="v-d-rec" class="text-center font-bold text-indigo-600">0</td><td class="text-center"><input type="checkbox" id="v-d-ss" class="accent-red-500"></td></tr>
+                        <tr><td class="py-3 font-bold text-slate-400">V.Med</td><td><input type="number" id="v-m-nic" value="0" class="w-12 p-1 text-center bg-slate-50 rounded border-none font-bold"></td><td><input type="number" id="v-m-ps" value="0" class="w-12 p-1 text-center bg-slate-50 rounded border-none font-bold"></td><td id="v-m-rec" class="text-center font-bold text-indigo-600">0</td><td class="text-center"><input type="checkbox" id="v-m-ss" class="accent-red-500"></td></tr>
+                        <tr class="border-b-2 border-slate-100"><td class="py-3 font-bold text-slate-400">V.Mes</td><td><input type="number" id="v-mes-nic" value="0" class="w-12 p-1 text-center bg-slate-50 rounded border-none font-bold"></td><td><input type="number" id="v-mes-ps" value="0" class="w-12 p-1 text-center bg-slate-50 rounded border-none font-bold"></td><td id="v-mes-rec" class="text-center font-bold text-indigo-600">0</td><td class="text-center"><input type="checkbox" id="v-mes-ss" class="accent-red-500"></td></tr>
+                        <tr class="bg-slate-50/50"><td class="py-3 font-bold text-slate-400">P.Dist</td><td><input type="number" id="p-d-nic" value="0" class="w-12 p-1 text-center bg-white rounded border-none font-bold"></td><td><input type="number" id="p-d-ps" value="0" class="w-12 p-1 text-center bg-white rounded border-none font-bold"></td><td id="p-d-rec" class="text-center font-bold text-indigo-600">0</td><td class="text-center"><input type="checkbox" id="p-d-ss" class="accent-red-500"></td></tr>
+                        <tr class="bg-slate-50/50"><td class="py-3 font-bold text-slate-400">P.Med</td><td><input type="number" id="p-m-nic" value="0" class="w-12 p-1 text-center bg-white rounded border-none font-bold"></td><td><input type="number" id="p-m-ps" value="0" class="w-12 p-1 text-center bg-white rounded border-none font-bold"></td><td id="p-m-rec" class="text-center font-bold text-indigo-600">0</td><td class="text-center"><input type="checkbox" id="p-m-ss" class="accent-red-500"></td></tr>
+                        <tr class="bg-slate-50/50"><td class="py-3 font-bold text-slate-400">P.Mes</td><td><input type="number" id="p-mes-nic" value="0" class="w-12 p-1 text-center bg-white rounded border-none font-bold"></td><td><input type="number" id="p-mes-ps" value="0" class="w-12 p-1 text-center bg-white rounded border-none font-bold"></td><td id="p-mes-rec" class="text-center font-bold text-indigo-600">0</td><td class="text-center"><input type="checkbox" id="p-mes-ss" class="accent-red-500"></td></tr>
                     </tbody>
                 </table>
             </div>
         </div>
 
-        <div id="historial-container" class="ficha-clinica">
-            <h3>Dientes Registrados:</h3>
-            <ul id="lista-historial">
-                <li style="color: #888;">No hay registros aún.</li>
-            </ul>
-        </div>
+        <section class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+            <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+                <i class="fas fa-history text-slate-400"></i> Dientes Registrados en esta Sesión
+            </h3>
+            <div id="lista-historial" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-8 gap-3">
+                </div>
+        </section>
+
     </main>
 
-    <footer>
-        <p>Versión Académica: <span id="version-num">0.0117</span></p>
+    <footer class="p-8 text-center text-slate-400 text-xs">
+        <p>Dental Suite | PeriodontoVoice Pro v0.0200 | Módulo Centralizado</p>
     </footer>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
-
