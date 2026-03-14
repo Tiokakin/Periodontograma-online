@@ -1,87 +1,72 @@
 /**
- * PeriodontoVoice Pro - v0.0203 
- * SISTEMA DE DIAGNÓSTICO ACTIVO
+ * PeriodontoVoice Pro - v0.0204 
+ * MÓDULO DE RECUPERACIÓN DE SESIÓN
  */
 
 document.addEventListener('DOMContentLoaded', () => {
+    // --- ANCLA: VARIABLES ---
     const btnVoz = document.getElementById('btn-voz');
-    const btnPdf = document.getElementById('btn-pdf');
     const status = document.getElementById('status');
+    const nombreDisplay = document.getElementById('nombre-paciente-display');
     const dienteLabel = document.getElementById('diente-actual');
 
-    // --- TEST DE LIBRERÍAS ---
-    console.log("Chequeando jsPDF...");
-    if (!window.jspdf) {
-        status.innerText = "❌ ERROR: Librería PDF no cargada.";
-    }
+    // --- ANCLA: CARGA DE SESIÓN (MODIFICADA) ---
+    const inicializarSesion = () => {
+        const sesion = localStorage.getItem('SesionClinica');
+        if (sesion) {
+            const datos = JSON.parse(sesion);
+            nombreDisplay.innerText = datos.paciente;
+            console.log("Sesión cargada: " + datos.paciente);
+        } else {
+            // Si no hay sesión del portal, permitimos uso manual
+            nombreDisplay.innerText = "Modo Invitado / Manual";
+            console.warn("No se encontró SesionClinica. Trabajando en local.");
+        }
+    };
 
-    // --- CONFIGURACIÓN DE VOZ ---
+    // --- ANCLA: CONFIGURACIÓN DE VOZ ---
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     
     if (!SpeechRecognition) {
-        status.innerText = "❌ ERROR: Navegador no soporta voz.";
+        status.innerText = "❌ ERROR: Navegador incompatible.";
     } else {
         const recognition = new SpeechRecognition();
         recognition.lang = 'es-CL';
         recognition.continuous = true;
-        recognition.interimResults = false;
 
-        // ACCIÓN DEL BOTÓN VOZ
         btnVoz.onclick = () => {
-            status.innerText = "⏳ Intentando activar micrófono...";
+            status.innerText = "⏳ Activando...";
             try {
-                recognition.start();
+                // Forzamos el reinicio si ya estaba activo
+                recognition.stop(); 
+                setTimeout(() => {
+                    recognition.start();
+                    console.log("Micrófono solicitado");
+                }, 400);
             } catch (err) {
-                status.innerText = "❌ Error al iniciar: " + err.message;
-                console.error(err);
-                // Si ya estaba iniciado, lo detenemos
-                recognition.stop();
+                recognition.start();
             }
         };
 
         recognition.onstart = () => {
-            status.innerText = "🎤 MICRÓFONO ACTIVO - Hable ahora";
-            btnVoz.style.backgroundColor = "#dc2626"; // Rojo (Tailwind red-600)
+            status.innerText = "🎤 ESCUCHANDO...";
+            btnVoz.style.backgroundColor = "#dc2626"; // Rojo
         };
 
         recognition.onresult = (event) => {
             const transcript = event.results[event.results.length - 1][0].transcript.toLowerCase();
             status.innerText = "Escuché: " + transcript;
-            
-            // Lógica simple de prueba: si dices "Diente", que cambie el label
-            if (transcript.includes("diente")) {
-                const num = transcript.match(/\d+/);
-                if(num) dienteLabel.innerText = "Diente: " + num[0];
-            }
+            // Aquí iría tu lógica de procesarTextoPeriodontal
         };
 
         recognition.onerror = (event) => {
-            status.innerText = "❌ Error de Micro: " + event.error;
-            if(event.error === 'not-allowed') {
-                alert("Bloqueado: Ve a los ajustes del candado en la URL y permite el micrófono.");
+            status.innerText = "❌ Error: " + event.error;
+            if (event.error === 'not-allowed') {
+                alert("Permiso denegado. Toca el candado en la barra de direcciones y permite el micrófono.");
             }
-        };
-
-        recognition.onend = () => {
-            status.innerText = "Micrófono cerrado.";
-            btnVoz.style.backgroundColor = "#4f46e5"; // Indigo (Tailwind)
         };
     }
 
-    // --- ACCIÓN DEL BOTÓN PDF ---
-    btnPdf.onclick = () => {
-        status.innerText = "⏳ Generando PDF...";
-        try {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            doc.setFontSize(20);
-            doc.text("TEST DE REPORTE CLINICO", 20, 20);
-            doc.text("Paciente: " + (document.getElementById('nombre-paciente-display').innerText), 20, 40);
-            doc.save("test_suite_dental.pdf");
-            status.innerText = "✅ PDF Descargado";
-        } catch (err) {
-            status.innerText = "❌ Error PDF: " + err.message;
-            alert("Error al crear PDF: " + err.message);
-        }
-    };
+    // Inicializar todo
+    inicializarSesion();
 });
